@@ -1,0 +1,2 @@
+# cryptojacking-defender
+Cryptojacking 
