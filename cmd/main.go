@@ -9,6 +9,7 @@ import (
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
 	"github.com/kamilwoloszyn/cryptojacking-defender/external/chrome"
 	"github.com/kamilwoloszyn/cryptojacking-defender/external/tcpdump"
+	"github.com/kamilwoloszyn/cryptojacking-defender/external/tshark"
 	"github.com/kamilwoloszyn/cryptojacking-defender/utils/cleanup"
 )
 
@@ -31,16 +32,17 @@ func main() {
 	chromeBrowser := chrome.New(cfg.BrowserSSLFilePath)
 	if err := chromeBrowser.Run(); err != nil {
 		log.Fatalf("[FATAL]: Couldn't run chrome browser: %s. Exiting.", err)
-		return
 	}
 	log.Println("[INFO]: Browser closed. Looking for dump program ...")
 	cancelTcpDump()
 	wg.Wait()
-
+	log.Println("[INFO]: Fixing corrupted package")
+	tcpDump.FixBrokenPackage(ctx)
+	tsharkClient := tshark.New(cfg.BrowserSSLFilePath)
+	log.Println("[INFO]: Decrypting traffic ...")
+	tsharkClient.Decrypt(cfg.TcpDumpFilePath)
 	//cleanup
 	log.Println("[INFO]: Cleaning files ...")
-	if err := cleanup.RemoveAsRoot(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath); err != nil {
-		log.Fatalf("[FATAL]: Cannot make cleanup: %s", err.Error())
-	}
+	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath)
 
 }
