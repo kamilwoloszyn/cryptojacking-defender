@@ -2,13 +2,26 @@ package cleanup
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"os/exec"
 )
 
-func RemoveAsRoot(path ...string) error {
-	for _, p := range path {
+// RemoveAsRoot force removes files with sudo command. It uses shell script.
+func RemoveAsRoot(pathes ...string) {
+	for _, p := range pathes {
 		cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("sudo rm -f %s", p))
-		return cmd.Run()
+		if err := cmd.Run(); err != nil {
+			log.Printf("[WARNING]: Cannot delete %s : %s", p, err)
+		}
 	}
-	return nil
+}
+
+// RemoveAsCurrentUser removes files without extra permissions.
+func RemoveAsCurrentUser(pathes ...string) {
+	for _, p := range pathes {
+		if err := os.Remove(p); err != nil {
+			log.Printf("[WARNING]: Cannot delete %s : %s", p, err)
+		}
+	}
 }
