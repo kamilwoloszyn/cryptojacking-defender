@@ -36,11 +36,13 @@ func main() {
 	log.Println("[INFO]: Browser closed. Looking for dump program ...")
 	cancelTcpDump()
 	wg.Wait()
-	log.Println("[INFO]: Fixing corrupted package")
+	log.Println("[INFO]: Fixing corrupted package ...")
 	tcpDump.FixBrokenPackage(ctx)
 	tsharkClient := tshark.New(cfg.BrowserSSLFilePath)
 	log.Println("[INFO]: Decrypting traffic ...")
-	tsharkClient.Decrypt(cfg.TcpDumpFilePath)
+	if err := tsharkClient.Decrypt(cfg.TcpDumpFilePath); err != nil {
+		log.Fatalf("[FATAL]: Cannot open decryption program: %s", err)
+	}
 	//cleanup
 	log.Println("[INFO]: Cleaning files ...")
 	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath)
