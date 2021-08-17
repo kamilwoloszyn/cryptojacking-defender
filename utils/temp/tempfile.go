@@ -3,7 +3,6 @@ package temp
 import "os/exec"
 
 // CreateTempFile creates new plain file and returns its path
-
 func CreateTempFile() (string, error) {
 	cmd := exec.Command("tempfile")
 	tempPath, err := cmd.Output()
