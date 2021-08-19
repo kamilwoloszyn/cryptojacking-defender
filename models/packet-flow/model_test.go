@@ -10,9 +10,7 @@ import (
 )
 
 func TrafficStatistcTest(t *testing.T) {
-	const (
-		timeLayout = "Jan 2, 2006 15:04:05.533162000 CEST"
-	)
+
 	traffic := []traffic.Traffic{
 		{
 			Index:       "packets-2021-08-10",
