@@ -23,11 +23,9 @@ func New(
 		NetworkInterface: networkIntreface,
 		OutputFile:       outputFile,
 	}
-
 }
 
 func (tcp *TcpDump) Capture(cCtx context.Context, wg *sync.WaitGroup) {
-
 	tcpRes := make(chan bool, 1)
 	wg.Add(1)
 	go func(tcpRes chan bool, cCtx context.Context) {
