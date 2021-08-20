@@ -23,16 +23,35 @@ func Generate(traffic *[]traffic.Traffic) []TrafficStatistic {
 		if duplicate, inversed, location := checkIfExistPairInTS(&trafficStatistic, trafficItem.Source.Layers.IPSrc, trafficItem.Source.Layers.IPDst); duplicate {
 			if inversed {
 				trafficStatistic[location].RecvQty++
+				trafficStatistic[location].FramesRecvFrameLen = append(trafficStatistic[location].FramesRecvFrameLen, trafficItem.Source.Layers.FrameLength)
+				trafficStatistic[location].FramesRecvRelativeTime = append(trafficStatistic[location].FramesRecvRelativeTime, trafficItem.Source.Layers.FrameTimeRelative)
+				continue
 			}
 			trafficStatistic[location].SendQty++
+			trafficStatistic[location].FramesSendFrameLen = append(trafficStatistic[location].FramesSendFrameLen, trafficItem.Source.Layers.FrameLength)
+			trafficStatistic[location].FramesSendRelativeTime = append(trafficStatistic[location].FramesSendRelativeTime, trafficItem.Source.Layers.FrameTimeRelative)
 			continue
 		}
 		trafficStatistic = append(trafficStatistic, TrafficStatistic{
-			SrcIP: trafficItem.Source.Layers.IPSrc,
-			DstIP: trafficItem.Source.Layers.IPDst,
+			SrcIP:                   trafficItem.Source.Layers.IPSrc,
+			DstIP:                   trafficItem.Source.Layers.IPDst,
+			SendQty:                 1,
+			RecvQty:                 0,
+			CryptoCurrencyPacketQty: 0,
+			FramesSendRelativeTime:  []float32{trafficItem.Source.Layers.FrameTimeRelative},
+			FramesSendFrameLen: []int32{
+				trafficItem.Source.Layers.FrameLength,
+			},
 		})
 	}
 	return trafficStatistic
+}
+
+func SelectIP(ts []TrafficStatistic, ipToSelect traffic.IPAddr) []TrafficStatistic {
+	for _, item := range ts {
+
+	}
+	return ts
 }
 
 // checkIfExistPairInTS check whether given pair (addr, addr2) exists in TrafficStatistic. If exists, it returns :
