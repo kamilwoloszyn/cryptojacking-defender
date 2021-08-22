@@ -111,7 +111,8 @@ func TestGenerateTrafficStatistc(t *testing.T) {
 						IPSrc:             "54.192.230.111",
 						IPDst:             "192.168.0.104",
 						FrameNumber:       876,
-						TLSContentType:    97,
+						FrameLength:       97,
+						TLSContentType:    23,
 						FrameTime:         "Aug 10, 2021 20:11:04.568167000 CEST",
 						FrameTimeRelative: 3.383902000,
 					},
@@ -299,12 +300,14 @@ func TestGenerateTrafficStatistc(t *testing.T) {
 	}
 
 	trafficStatistic := packetflow.Generate(&args.args)
-	if equal := reflect.DeepEqual(trafficStatistic, args.expected); !equal {
-		t.Fatal(
-			fmt.Sprintf(
-				"Got %v but expected %v", trafficStatistic, args.expected,
-			),
-		)
+	for i, resultItem := range trafficStatistic {
+		if equal := reflect.DeepEqual(resultItem, args.expected[i]); !equal {
+			t.Fatal(
+				fmt.Sprintf(
+					"Got %v but expected %v", resultItem, args.expected[i],
+				),
+			)
+		}
 	}
 }
 
@@ -385,25 +388,26 @@ func TestSelectIP(t *testing.T) {
 		expected: []packetflow.TrafficStatistic{
 			{
 				SrcIP:                   "192.168.0.104",
-				DstIP:                   "54.192.230.111",
-				SendQty:                 1,
-				RecvQty:                 3,
+				DstIP:                   "54.192.230.21",
+				SendQty:                 3,
+				RecvQty:                 2,
 				CryptoCurrencyPacketQty: 0,
 				FramesSendRelativeTime: []float32{
-					3.379272000,
+					3.468356000,
+					3.468541000,
+					3.468551000,
 				},
 				FramesRecvRelativeTime: []float32{
-					3.379210000,
-					3.383902000,
-					3.392822000,
+					3.348897000,
+					3.378947000,
 				},
 				FramesSendFrameLen: []int32{
+					158,
 					97,
 				},
 				FramesRecvFrameLen: []int32{
-					128,
-					97,
-					1043,
+					1454,
+					1454,
 				},
 			},
 			{
@@ -456,9 +460,13 @@ func TestSelectIP(t *testing.T) {
 	}
 
 	result := packetflow.SelectIP(args.args, myIP)
-	if equal := reflect.DeepEqual(result, args.expected); !equal {
-		t.Fatal(
-			fmt.Sprintf("got %v but expected %v", result, args.expected),
-		)
+	for i, resultItem := range result {
+		if equal := reflect.DeepEqual(resultItem, args.expected[i]); !equal {
+			t.Fatal(
+				fmt.Sprintf(
+					"got %v but expected %v", resultItem, args.expected[i],
+				),
+			)
+		}
 	}
 }
