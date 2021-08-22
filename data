@@ -1,0 +1,382 @@
+{
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.21"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "823"
+        ],
+        "frame.len": [
+          "1454"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.533162000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.348897000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.21"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "845"
+        ],
+        "frame.len": [
+          "1454"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.563212000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.378947000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.111"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "852"
+        ],
+        "frame.len": [
+          "128"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.563475000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.379210000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "54.192.230.111"
+        ],
+        "frame.number": [
+          "854"
+        ],
+        "frame.len": [
+          "97"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.563537000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.379272000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.21"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "873"
+        ],
+        "frame.len": [
+          "1454"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.567367000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.383102000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.111"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "876"
+        ],
+        "frame.len": [
+          "97"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.568167000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.383902000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.21"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "900"
+        ],
+        "frame.len": [
+          "1454"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.574273000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.390008000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.111"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "907"
+        ],
+        "frame.len": [
+          "1043"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.577087000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.392822000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "54.192.230.21"
+        ],
+        "ip.dst": [
+          "192.168.0.104"
+        ],
+        "frame.number": [
+          "912"
+        ],
+        "frame.len": [
+          "1182"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.578005000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.393740000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "3.23.190.137"
+        ],
+        "tls.record.content_type": [
+          "22"
+        ],
+        "frame.number": [
+          "917"
+        ],
+        "frame.len": [
+          "583"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.580098000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.395833000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "54.192.230.21"
+        ],
+        "frame.number": [
+          "931"
+        ],
+        "frame.len": [
+          "158"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.652621000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.468356000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "54.192.230.21"
+        ],
+        "frame.number": [
+          "932"
+        ],
+        "frame.len": [
+          "97"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.652806000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.468541000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "54.192.230.21"
+        ],
+        "frame.number": [
+          "933"
+        ],
+        "frame.len": [
+          "491"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.652850000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.468585000"
+        ]
+      }
+    }
+  },
+  {
+    "_index": "packets-2021-08-10",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "ip.src": [
+          "192.168.0.104"
+        ],
+        "ip.dst": [
+          "54.192.230.21"
+        ],
+        "frame.number": [
+          "934"
+        ],
+        "frame.len": [
+          "160"
+        ],
+        "frame.time": [
+          "Aug 10, 2021 20:11:04.652917000 CEST"
+        ],
+        "frame.time_relative": [
+          "3.468652000"
+        ]
+      }
+    }
+  },
+
