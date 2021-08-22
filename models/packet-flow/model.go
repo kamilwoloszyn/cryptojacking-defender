@@ -47,10 +47,14 @@ func Generate(traffic *[]traffic.Traffic) []TrafficStatistic {
 	return trafficStatistic
 }
 
-func SelectIP(ts []TrafficStatistic, ipToSelect traffic.IPAddr) []TrafficStatistic {
-	for _, item := range ts {
-
+func SelectIP(ts []TrafficStatistic, ipToSelect string) []TrafficStatistic {
+	swapIndexes := []int{}
+	for i, item := range ts {
+		if item.DstIP == ipToSelect {
+			swapIndexes = append(swapIndexes, i)
+		}
 	}
+	ts = swapElements(ts, swapIndexes...)
 	return ts
 }
 
@@ -67,5 +71,14 @@ func checkIfExistPairInTS(ts *[]TrafficStatistic, addr1 string, addr2 string) (b
 		}
 	}
 	return false, false, -1
+}
 
+func swapElements(ts []TrafficStatistic, indexes ...int) []TrafficStatistic {
+	for _, index := range indexes {
+		ts[index].SrcIP, ts[index].DstIP = ts[index].DstIP, ts[index].SrcIP
+		ts[index].RecvQty, ts[index].SendQty = ts[index].SendQty, ts[index].RecvQty
+		ts[index].FramesRecvFrameLen, ts[index].FramesSendFrameLen = ts[index].FramesSendFrameLen, ts[index].FramesRecvFrameLen
+		ts[index].FramesRecvRelativeTime, ts[index].FramesSendRelativeTime = ts[index].FramesSendRelativeTime, ts[index].FramesRecvRelativeTime
+	}
+	return ts
 }
