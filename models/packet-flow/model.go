@@ -1,8 +1,14 @@
 package packetflow
 
 import (
+	"github.com/kamilwoloszyn/cryptojacking-defender/models/minerscan"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
 )
+
+type MaliciusTrafficStatistic struct {
+	SentKeywords int32
+	RecvKeywords int32
+}
 
 // TrafficStatistic which contain some information for cryptojacking detection.
 type TrafficStatistic struct {
@@ -15,21 +21,26 @@ type TrafficStatistic struct {
 	FramesRecvRelativeTime  []float32
 	FramesSendFrameLen      []int32
 	FramesRecvFrameLen      []int32
+	MaliciusTrafficStatistic
 }
 
-func Generate(traffic *[]traffic.Traffic) []TrafficStatistic {
+// Generate generates a traffic statistics with implemented MinerScanner
+func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) []TrafficStatistic {
 	trafficStatistic := []TrafficStatistic{}
 	for _, trafficItem := range *traffic {
+		keywordsQty := ms.Scan(&trafficItem)
 		if duplicate, inversed, location := checkIfExistPairInTS(&trafficStatistic, trafficItem.Source.Layers.IPSrc, trafficItem.Source.Layers.IPDst); duplicate {
 			if inversed {
 				trafficStatistic[location].RecvQty++
 				trafficStatistic[location].FramesRecvFrameLen = append(trafficStatistic[location].FramesRecvFrameLen, trafficItem.Source.Layers.FrameLength)
 				trafficStatistic[location].FramesRecvRelativeTime = append(trafficStatistic[location].FramesRecvRelativeTime, trafficItem.Source.Layers.FrameTimeRelative)
+				trafficStatistic[location].MaliciusTrafficStatistic.RecvKeywords = keywordsQty
 				continue
 			}
 			trafficStatistic[location].SendQty++
 			trafficStatistic[location].FramesSendFrameLen = append(trafficStatistic[location].FramesSendFrameLen, trafficItem.Source.Layers.FrameLength)
 			trafficStatistic[location].FramesSendRelativeTime = append(trafficStatistic[location].FramesSendRelativeTime, trafficItem.Source.Layers.FrameTimeRelative)
+			trafficStatistic[location].MaliciusTrafficStatistic.SentKeywords = keywordsQty
 			continue
 		}
 		trafficStatistic = append(trafficStatistic, TrafficStatistic{
@@ -47,6 +58,7 @@ func Generate(traffic *[]traffic.Traffic) []TrafficStatistic {
 	return trafficStatistic
 }
 
+// SelectIP converts trafficStatistic in a way, where selectedIP is always srcIP.
 func SelectIP(ts []TrafficStatistic, ipToSelect string) []TrafficStatistic {
 	swapIndexes := []int{}
 	for i, item := range ts {
