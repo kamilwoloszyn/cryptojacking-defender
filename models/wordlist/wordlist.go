@@ -19,7 +19,7 @@ const (
 	statusResponse switchFlag = "res"
 )
 
-func (w *WordList) ParseFromFile(absPath string) (*WordList, error) {
+func ParseFromFile(absPath string) (*WordList, error) {
 	var flag switchFlag
 	wList := WordList{
 		Req: []string{},
