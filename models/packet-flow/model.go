@@ -12,15 +12,14 @@ type MaliciusTrafficStatistic struct {
 
 // TrafficStatistic which contain some information for cryptojacking detection.
 type TrafficStatistic struct {
-	SrcIP                   string
-	DstIP                   string
-	SendQty                 int32
-	RecvQty                 int32
-	CryptoCurrencyPacketQty int32
-	FramesSendRelativeTime  []float32
-	FramesRecvRelativeTime  []float32
-	FramesSendFrameLen      []int32
-	FramesRecvFrameLen      []int32
+	SrcIP                  string
+	DstIP                  string
+	SendQty                int32
+	RecvQty                int32
+	FramesSendRelativeTime []float32
+	FramesRecvRelativeTime []float32
+	FramesSendFrameLen     []int32
+	FramesRecvFrameLen     []int32
 	MaliciusTrafficStatistic
 }
 
@@ -44,12 +43,11 @@ func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) []TrafficS
 			continue
 		}
 		trafficStatistic = append(trafficStatistic, TrafficStatistic{
-			SrcIP:                   trafficItem.Source.Layers.IPSrc,
-			DstIP:                   trafficItem.Source.Layers.IPDst,
-			SendQty:                 1,
-			RecvQty:                 0,
-			CryptoCurrencyPacketQty: 0,
-			FramesSendRelativeTime:  []float32{trafficItem.Source.Layers.FrameTimeRelative},
+			SrcIP:                  trafficItem.Source.Layers.IPSrc,
+			DstIP:                  trafficItem.Source.Layers.IPDst,
+			SendQty:                1,
+			RecvQty:                0,
+			FramesSendRelativeTime: []float32{trafficItem.Source.Layers.FrameTimeRelative},
 			FramesSendFrameLen: []int32{
 				trafficItem.Source.Layers.FrameLength,
 			},
