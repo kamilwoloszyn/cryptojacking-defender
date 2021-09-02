@@ -10,18 +10,17 @@ import (
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/wordlist"
 )
 
-type args struct {
-	arg      traffic.Traffic
-	expected int32
-}
-
 func TestScan(t *testing.T) {
-	wordList, err := wordlist.ParseFromFile("/home/kamil/Projects/cryptojacking-defender/models/minerscan/wordlist_test.txt")
+	wordList, err := wordlist.ParseFromFile("/home/kamil/Projects/cryptojacking-defender/static/wordlist_test.txt")
 	if err != nil {
 		t.Error(err)
 	}
 	minerScanner := minerscan.New(wordList)
-	testArgs := []args{
+	testCases := []struct {
+		desc     string
+		arg      traffic.Traffic
+		expected int
+	}{
 		{
 			arg: traffic.Traffic{
 				Index:       "packets-2021-08-10",
@@ -29,12 +28,12 @@ func TestScan(t *testing.T) {
 				Score:       nil,
 				Source: traffic.Source{
 					Layers: traffic.Layers{
-						IPSrc:             "54.192.230.21",
-						IPDst:             "192.168.0.104",
-						FrameNumber:       823,
-						FrameLength:       1454,
-						FrameTime:         "Aug 10, 2021 20:11:04.533162000 CEST",
-						FrameTimeRelative: 3.348897000,
+						IPSrc:             []string{"54.192.230.21"},
+						IPDst:             []string{"192.168.0.104"},
+						FrameNumber:       []string{"823"},
+						FrameLength:       []string{"1454"},
+						FrameTime:         []string{"Aug 10, 2021 20:11:04.533162000 CEST"},
+						FrameTimeRelative: []string{"3.348897000"},
 						TextData: []string{
 							"Timestamps",
 							"{\"type\":\"authed\",\"params\":{\"token\":\"313adf01-9ea8-426c-84b4-7083c7bb5d79\",\"hashes\":0}}",
@@ -52,12 +51,12 @@ func TestScan(t *testing.T) {
 				Score:       nil,
 				Source: traffic.Source{
 					Layers: traffic.Layers{
-						IPSrc:             "192.168.0.104",
-						IPDst:             "54.192.230.21",
-						FrameNumber:       845,
-						FrameLength:       1454,
-						FrameTime:         "Aug 10, 2021 20:11:04.563212000 CEST",
-						FrameTimeRelative: 3.378947000,
+						IPSrc:             []string{"192.168.0.104"},
+						IPDst:             []string{"54.192.230.21"},
+						FrameNumber:       []string{"845"},
+						FrameLength:       []string{"1454"},
+						FrameTime:         []string{"Aug 10, 2021 20:11:04.563212000 CEST"},
+						FrameTimeRelative: []string{"3.378947000"},
 						TextData: []string{
 							"Timestamps",
 							"{\"type\":\"submit\",\"params\":{\"job_id\":\"xn5w6DxHT4M5Tpg+zUK7YJmdUGri\",\"nonce\":\"88975e1d\",\"result\":\"130193af6f62e2a9688f92b3e297d3d169d7c4047f14f6ec91a764e253320400\"}}",
@@ -67,12 +66,32 @@ func TestScan(t *testing.T) {
 			},
 			expected: 3,
 		},
+		{
+			arg: traffic.Traffic{
+				Index:       "packets-2021-08-10",
+				TypeTraffic: "doc",
+				Score:       nil,
+				Source: traffic.Source{
+					Layers: traffic.Layers{
+						IPSrc:             []string{"192.168.0.104"},
+						IPDst:             []string{"54.192.230.28"},
+						FrameNumber:       []string{"845"},
+						FrameLength:       []string{"1454"},
+						FrameTime:         []string{"Aug 10, 2021 20:11:04.563212000 CEST"},
+						FrameTimeRelative: []string{"3.378947000"},
+						TextData: []string{
+							"Timestamps",
+						},
+					},
+				},
+			},
+			expected: 0,
+		},
 	}
-
-	for _, tt := range testArgs {
-		if result := minerScanner.Scan(&tt.arg); !reflect.DeepEqual(tt.expected, result) {
+	for _, tC := range testCases {
+		if result := minerScanner.Scan(&tC.arg); !reflect.DeepEqual(tC.expected, result) {
 			t.Error(
-				fmt.Sprintf("Got %v but expected:%v ", result, tt.expected),
+				fmt.Sprintf("Got %v but expected:%v ", result, tC.expected),
 			)
 		}
 	}
