@@ -19,8 +19,8 @@ func New(wordList *wordlist.WordList) *MinerScanner {
 }
 
 // Scan scans a text in order to get suspicious keyword.
-func (mn *MinerScanner) Scan(t *traffic.Traffic) int32 {
-	var result int32
+func (mn *MinerScanner) Scan(t *traffic.Traffic) int {
+	var result int
 	for _, itemToScan := range t.Source.Layers.TextData {
 		for _, keyword := range mn.wordList.Req {
 			if found := strings.Contains(itemToScan, keyword); found {
