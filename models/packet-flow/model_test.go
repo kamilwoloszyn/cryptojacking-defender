@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kamilwoloszyn/cryptojacking-defender/models/base"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/minerscan"
 	packetflow "github.com/kamilwoloszyn/cryptojacking-defender/models/packet-flow"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
@@ -243,8 +244,10 @@ func TestGenerateTrafficStatistc(t *testing.T) {
 			},
 			expected: []packetflow.TrafficStatistic{
 				{
-					SrcIP:   "54.192.230.21",
-					DstIP:   "192.168.0.104",
+					Base: base.BaseIP{
+						SrcIP: "54.192.230.21",
+						DstIP: "192.168.0.104",
+					},
 					SendQty: 5,
 					RecvQty: 4,
 					FramesSendRelativeTime: []float32{
@@ -275,8 +278,10 @@ func TestGenerateTrafficStatistc(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "54.192.230.111",
-					DstIP:   "192.168.0.104",
+					Base: base.BaseIP{
+						SrcIP: "54.192.230.111",
+						DstIP: "192.168.0.104",
+					},
 					SendQty: 3,
 					RecvQty: 1,
 					FramesSendRelativeTime: []float32{
@@ -297,8 +302,10 @@ func TestGenerateTrafficStatistc(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "192.168.0.104",
-					DstIP:   "3.23.190.137",
+					Base: base.BaseIP{
+						SrcIP: "192.168.0.104",
+						DstIP: "3.23.190.137",
+					},
 					SendQty: 1,
 					RecvQty: 0,
 					FramesSendRelativeTime: []float32{
@@ -372,8 +379,10 @@ func TestSelectIP(t *testing.T) {
 			desc: "Correct ip array",
 			args: []packetflow.TrafficStatistic{
 				{
-					SrcIP:   "54.192.230.21",
-					DstIP:   "192.168.0.104",
+					Base: base.BaseIP{
+						SrcIP: "54.192.230.21",
+						DstIP: "192.168.0.104",
+					},
 					SendQty: 2,
 					RecvQty: 3,
 					FramesSendRelativeTime: []float32{
@@ -395,8 +404,10 @@ func TestSelectIP(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "54.192.230.111",
-					DstIP:   "192.168.0.104",
+					Base: base.BaseIP{
+						SrcIP: "54.192.230.111",
+						DstIP: "192.168.0.104",
+					},
 					SendQty: 3,
 					RecvQty: 1,
 					FramesSendRelativeTime: []float32{
@@ -417,8 +428,10 @@ func TestSelectIP(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "192.168.0.104",
-					DstIP:   "54.192.230.112",
+					Base: base.BaseIP{
+						SrcIP: "192.168.0.104",
+						DstIP: "54.192.230.112",
+					},
 					SendQty: 3,
 					RecvQty: 1,
 					FramesSendRelativeTime: []float32{
@@ -441,8 +454,10 @@ func TestSelectIP(t *testing.T) {
 			},
 			expected: []packetflow.TrafficStatistic{
 				{
-					SrcIP:   "192.168.0.104",
-					DstIP:   "54.192.230.21",
+					Base: base.BaseIP{
+						SrcIP: "192.168.0.104",
+						DstIP: "54.192.230.21",
+					},
 					SendQty: 3,
 					RecvQty: 2,
 					FramesSendRelativeTime: []float32{
@@ -464,8 +479,10 @@ func TestSelectIP(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "192.168.0.104",
-					DstIP:   "54.192.230.111",
+					Base: base.BaseIP{
+						SrcIP: "192.168.0.104",
+						DstIP: "54.192.230.111",
+					},
 					SendQty: 1,
 					RecvQty: 3,
 					FramesSendRelativeTime: []float32{
@@ -486,8 +503,10 @@ func TestSelectIP(t *testing.T) {
 					},
 				},
 				{
-					SrcIP:   "192.168.0.104",
-					DstIP:   "54.192.230.112",
+					Base: base.BaseIP{
+						SrcIP: "192.168.0.104",
+						DstIP: "54.192.230.112",
+					},
 					SendQty: 3,
 					RecvQty: 1,
 					FramesSendRelativeTime: []float32{
