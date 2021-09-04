@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kamilwoloszyn/cryptojacking-defender/models/base"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/minerscan"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
 )
 
 // TrafficStatistic which contain some information for cryptojacking detection.
 type TrafficStatistic struct {
-	SrcIP                    string
-	DstIP                    string
+	Base                     base.BaseIP
 	SendQty                  int
 	RecvQty                  int
 	FramesSendRelativeTime   []float32
@@ -48,8 +48,10 @@ func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) ([]Traffic
 			continue
 		}
 		trafficStatistic = append(trafficStatistic, TrafficStatistic{
-			SrcIP:                  trafficItem.Source.Layers.IPSrc[0],
-			DstIP:                  trafficItem.Source.Layers.IPDst[0],
+			Base: base.BaseIP{
+				SrcIP: trafficItem.Source.Layers.IPSrc[0],
+				DstIP: trafficItem.Source.Layers.IPDst[0],
+			},
 			SendQty:                1,
 			RecvQty:                0,
 			FramesSendRelativeTime: []float32{convertStrToFloat32(trafficItem.Source.Layers.FrameTimeRelative[0])},
@@ -65,7 +67,7 @@ func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) ([]Traffic
 func SelectIP(ts []TrafficStatistic, ipToSelect string) []TrafficStatistic {
 	swapIndexes := []int{}
 	for i, item := range ts {
-		if item.DstIP == ipToSelect {
+		if item.Base.DstIP == ipToSelect {
 			swapIndexes = append(swapIndexes, i)
 		}
 	}
@@ -78,10 +80,10 @@ func SelectIP(ts []TrafficStatistic, ipToSelect string) []TrafficStatistic {
 // If not exists, it returns false,false -1
 func checkIfExistPairInTS(ts *[]TrafficStatistic, addr1 string, addr2 string) (bool, bool, int) {
 	for key, tsItem := range *ts {
-		if tsItem.SrcIP == addr1 && tsItem.DstIP == addr2 {
+		if tsItem.Base.SrcIP == addr1 && tsItem.Base.DstIP == addr2 {
 			return true, false, key
 		}
-		if tsItem.SrcIP == addr2 && tsItem.DstIP == addr1 {
+		if tsItem.Base.SrcIP == addr2 && tsItem.Base.DstIP == addr1 {
 			return true, true, key
 		}
 	}
@@ -90,7 +92,7 @@ func checkIfExistPairInTS(ts *[]TrafficStatistic, addr1 string, addr2 string) (b
 
 func swapElements(ts []TrafficStatistic, indexes ...int) []TrafficStatistic {
 	for _, index := range indexes {
-		ts[index].SrcIP, ts[index].DstIP = ts[index].DstIP, ts[index].SrcIP
+		ts[index].Base.SrcIP, ts[index].Base.DstIP = ts[index].Base.DstIP, ts[index].Base.SrcIP
 		ts[index].RecvQty, ts[index].SendQty = ts[index].SendQty, ts[index].RecvQty
 		ts[index].FramesRecvFrameLen, ts[index].FramesSendFrameLen = ts[index].FramesSendFrameLen, ts[index].FramesRecvFrameLen
 		ts[index].FramesRecvRelativeTime, ts[index].FramesSendRelativeTime = ts[index].FramesSendRelativeTime, ts[index].FramesRecvRelativeTime
