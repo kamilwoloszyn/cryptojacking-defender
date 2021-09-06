@@ -89,11 +89,13 @@ func TestScan(t *testing.T) {
 		},
 	}
 	for _, tC := range testCases {
-		if result := minerScanner.Scan(&tC.arg); !reflect.DeepEqual(tC.expected, result) {
-			t.Error(
-				fmt.Sprintf("Got %v but expected:%v ", result, tC.expected),
-			)
-		}
+		t.Run(tC.desc, func(t *testing.T) {
+			if result := minerScanner.Scan(&tC.arg); !reflect.DeepEqual(tC.expected, result) {
+				t.Error(
+					fmt.Sprintf("Got %v but expected:%v ", result, tC.expected),
+				)
+			}
+		})
 	}
 
 }
