@@ -2,6 +2,7 @@ package tstraining_test
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
@@ -118,17 +119,17 @@ func TestExtract(t *testing.T) {
 				{
 					SentMaliciousPacketRatio: 3.0 / 5.0,
 					RecvMaliciousPacketRatio: 2.0 / 4.0,
-					AvgGapSentRT:             ((3.393740000 - 3.390008000) + (3.390008000 - 3.383102000) + (3.383102000 - 3.378947000) + (3.378947000 - 3.348897000)) / 4.0,
-					AvgGapRecvRT:             ((3.468652000 - 3.468585000) + (3.468585000 - 3.468541000) + (3.468541000 - 3.468356000)) / 3.0,
+					AvgGapSentRT:             0.01121074,
+					AvgGapRecvRT:             9.870529e-05,
 					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
-					AvgLenRecvFrame:          (158 + 97 + 491 + 160) / 4,
+					AvgLenRecvFrame:          226.5,
 					SendRecvRatio:            5.0 / 4.0,
 					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 0,
 					RecvMaliciousPacketRatio: 0,
-					AvgGapSentRT:             ((3.392822000 - 3.383902000) + (3.383902000 - 3.379210000)) / 2.0,
+					AvgGapSentRT:             0.006806016,
 					AvgGapRecvRT:             3.379272000,
 					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
 					AvgLenRecvFrame:          97.0,
@@ -157,6 +158,106 @@ func TestExtract(t *testing.T) {
 						"Got %v but expected %v", result, tC.expected,
 					),
 				)
+			}
+		})
+	}
+}
+
+func TestSaveAsJSON(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		arg      []tstraining.TsTrainingData
+		expected []tstraining.TsTrainingData
+	}{
+		{
+			desc: "Correct training data",
+			arg: []tstraining.TsTrainingData{
+				{
+					SentMaliciousPacketRatio: 3.0 / 5.0,
+					RecvMaliciousPacketRatio: 2.0 / 4.0,
+					AvgGapSentRT:             0.01121074,
+					AvgGapRecvRT:             9.870529e-05,
+					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
+					AvgLenRecvFrame:          226.5,
+					SendRecvRatio:            5.0 / 4.0,
+					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
+				},
+				{
+					SentMaliciousPacketRatio: 0,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             0.006806016,
+					AvgGapRecvRT:             3.379272000,
+					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
+					AvgLenRecvFrame:          97.0,
+					SendRecvRatio:            3 / 1,
+					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+				},
+				{
+					SentMaliciousPacketRatio: 1,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             3.395833000,
+					AvgGapRecvRT:             0,
+					AvgLenSentFrame:          583,
+					AvgLenRecvFrame:          0,
+					SendRecvRatio:            0,
+					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+				},
+			},
+			expected: []tstraining.TsTrainingData{
+				{
+					SentMaliciousPacketRatio: 3.0 / 5.0,
+					RecvMaliciousPacketRatio: 2.0 / 4.0,
+					AvgGapSentRT:             0.01121074,
+					AvgGapRecvRT:             9.870529e-05,
+					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
+					AvgLenRecvFrame:          226.5,
+					SendRecvRatio:            5.0 / 4.0,
+					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
+				},
+				{
+					SentMaliciousPacketRatio: 0,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             0.006806016,
+					AvgGapRecvRT:             3.379272000,
+					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
+					AvgLenRecvFrame:          97.0,
+					SendRecvRatio:            3 / 1,
+					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+				},
+				{
+					SentMaliciousPacketRatio: 1,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             3.395833000,
+					AvgGapRecvRT:             0,
+					AvgLenSentFrame:          583,
+					AvgLenRecvFrame:          0,
+					SendRecvRatio:            0,
+					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+				},
+			},
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			if err := tstraining.SaveAsJSON(&tC.arg); err != nil {
+				t.Fatalf(
+					"Couldn't save JSON: %s", err.Error(),
+				)
+			}
+			result, err := tstraining.LoadFromJSON()
+			if err != nil {
+				t.Fatalf("Error during loading a file: %s", err)
+			}
+			if equal := reflect.DeepEqual(result, tC.expected); !equal {
+				t.Fatalf(
+					"Got %v but expected %v", result, tC.expected,
+				)
+			}
+		})
+		t.Cleanup(func() {
+			if err := os.Remove("training_data.txt"); err != nil {
+				t.Error("Couldn't remove a test file.")
 			}
 		})
 	}
