@@ -1,0 +1,7 @@
+sent_malicious_packet_ratio,recv_malicious_packet_ratio,avg_gap_sent_rt,avg_gap_recv_rt,avg_len_sent_frame,avg_len_recv_frame,send_recv_ratio,estimated_behaviour
+5.3,3.3,1.5,0.2,12.2,13.1,10,cryptojacking
+6.4,3.2,4.5,1.7,20.9,22.3,19,nocryptojacking
+5,3.3,1.5,0.2,12.1,13.1,10,cryptojacking
+7,3.2,4.7,1.4,21.0,22.3,20,cryptojacking
+4.6,3.1,1.4,0.2,12.1,13.1,10,cryptojacking
+6.9,3.1,4.9,1.4,20,22.3,19.6,cryptojacking
