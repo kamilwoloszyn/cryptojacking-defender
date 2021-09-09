@@ -5,3 +5,10 @@ type BaseIP struct {
 	SrcIP string
 	DstIP string
 }
+
+type CryptoJackingState string
+
+const (
+	FieldCryptoJackingBehavior    CryptoJackingState = "cryptojacking"
+	FieldNonCryptoJackingBehavior CryptoJackingState = "nocryptojacking"
+)
