@@ -124,7 +124,7 @@ func TestExtract(t *testing.T) {
 					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
 					AvgLenRecvFrame:          226.5,
 					SendRecvRatio:            5.0 / 4.0,
-					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
+					ConsideredAs:             base.FieldCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 0,
@@ -134,7 +134,7 @@ func TestExtract(t *testing.T) {
 					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
 					AvgLenRecvFrame:          97.0,
 					SendRecvRatio:            3 / 1,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 1,
@@ -144,7 +144,7 @@ func TestExtract(t *testing.T) {
 					AvgLenSentFrame:          583,
 					AvgLenRecvFrame:          0,
 					SendRecvRatio:            0,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 			},
 		},
@@ -180,7 +180,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
 					AvgLenRecvFrame:          226.5,
 					SendRecvRatio:            5.0 / 4.0,
-					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
+					ConsideredAs:             base.FieldCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 0,
@@ -190,7 +190,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
 					AvgLenRecvFrame:          97.0,
 					SendRecvRatio:            3 / 1,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 1,
@@ -200,7 +200,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          583,
 					AvgLenRecvFrame:          0,
 					SendRecvRatio:            0,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 			},
 			expected: []tstraining.TsTrainingData{
@@ -212,7 +212,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          (1454.0 + 1454.0 + 1454.0 + 1454.0 + 1182.0) / 5.0,
 					AvgLenRecvFrame:          226.5,
 					SendRecvRatio:            5.0 / 4.0,
-					ConsideredAs:             tstraining.FieldCryptoJackingBehavior,
+					ConsideredAs:             base.FieldCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 0,
@@ -222,7 +222,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          (128.0 + 97.0 + 1043.0) / 3.0,
 					AvgLenRecvFrame:          97.0,
 					SendRecvRatio:            3 / 1,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 				{
 					SentMaliciousPacketRatio: 1,
@@ -232,7 +232,7 @@ func TestSaveAsJSON(t *testing.T) {
 					AvgLenSentFrame:          583,
 					AvgLenRecvFrame:          0,
 					SendRecvRatio:            0,
-					ConsideredAs:             tstraining.FieldNonCryptoJackingBehavior,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 				},
 			},
 		},
@@ -258,6 +258,80 @@ func TestSaveAsJSON(t *testing.T) {
 		t.Cleanup(func() {
 			if err := os.Remove("training_data.txt"); err != nil {
 				t.Error("Couldn't remove a test file.")
+			}
+		})
+	}
+}
+
+func TestSaveReadCSV(t *testing.T) {
+	testCases := []struct {
+		desc        string
+		arg         []tstraining.TsTrainingData
+		expected    []tstraining.TsTrainingData
+		wantSaveErr bool
+		wantReadErr bool
+	}{
+		{
+			desc: "Correct data",
+			arg: []tstraining.TsTrainingData{
+				{
+					SentMaliciousPacketRatio: 0,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             0.006806,
+					AvgGapRecvRT:             3.379272000,
+					AvgLenSentFrame:          422.6667,
+					AvgLenRecvFrame:          97.0,
+					SendRecvRatio:            3.0,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
+				},
+				{
+					SentMaliciousPacketRatio: 1,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             3.395833000,
+					AvgGapRecvRT:             0,
+					AvgLenSentFrame:          583,
+					AvgLenRecvFrame:          0,
+					SendRecvRatio:            0,
+					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
+				},
+			},
+			expected: []tstraining.TsTrainingData{
+				{
+					SentMaliciousPacketRatio: 0,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             0.006806,
+					AvgGapRecvRT:             3.379272000,
+					AvgLenSentFrame:          422.6667,
+					AvgLenRecvFrame:          97.0,
+					SendRecvRatio:            3.0,
+				},
+				{
+					SentMaliciousPacketRatio: 1,
+					RecvMaliciousPacketRatio: 0,
+					AvgGapSentRT:             3.395833000,
+					AvgGapRecvRT:             0,
+					AvgLenSentFrame:          583,
+					AvgLenRecvFrame:          0,
+					SendRecvRatio:            0,
+				},
+			},
+			wantSaveErr: false,
+			wantReadErr: false,
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			if err := tstraining.SaveAsCSV("test_data.csv", tC.arg); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
+				t.Fatalf(
+					"Got err: %v, but expected to be %v", err.Error(), tC.wantReadErr,
+				)
+			}
+			if result, err := tstraining.ReadFromCSV(os.TempDir()+"/test_data.csv", true); !reflect.DeepEqual(result, tC.expected) || !reflect.DeepEqual(err != nil, tC.wantReadErr) {
+				if (err != nil) != tC.wantReadErr {
+					t.Fatalf("Got err: %v, but expected: %v ", err, tC.wantReadErr)
+				}
+				t.Fatalf("Got %v but expected %v", result, tC.expected)
 			}
 		})
 	}
