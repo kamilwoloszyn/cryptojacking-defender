@@ -20,7 +20,7 @@ func TestInitialize(t *testing.T) {
 	}{
 		{
 			desc:    "existing file path",
-			arg:     "iris_headers.csv",
+			arg:     "traffic_data.csv",
 			wantErr: false,
 		},
 	}
