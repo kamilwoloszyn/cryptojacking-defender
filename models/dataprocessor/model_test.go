@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	PathToCSVFile = "/tmp/test_data.csv"
+	PathToCSVDataFile = "/home/kamil/Projects/cryptojacking-defender/models/dataprocessor/traffic_data.csv"
 )
 
 func TestInitialize(t *testing.T) {
@@ -20,7 +20,7 @@ func TestInitialize(t *testing.T) {
 	}{
 		{
 			desc:    "existing file path",
-			arg:     "traffic_data.csv",
+			arg:     PathToCSVDataFile,
 			wantErr: false,
 		},
 	}
@@ -44,7 +44,7 @@ func TestInitialize(t *testing.T) {
 }
 
 func TestPrediction(t *testing.T) {
-	dp, err := dataprocessor.New("iris_headers.csv")
+	dp, err := dataprocessor.New(PathToCSVDataFile)
 	if err != nil {
 		t.Fatal(err)
 	}
