@@ -46,20 +46,22 @@ func Extract(trafficStats *[]packetflow.TrafficStatistic) []TsTrainingData {
 }
 
 // SaveAsJSON saves training data into a txt file
-func SaveAsJSON(data *[]TsTrainingData) error {
+func SaveAsJSON(data *[]TsTrainingData, absPath string) error {
 	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(data); err != nil {
 		return fmt.Errorf(
 			"couldn't encode JSON: %v", err.Error(),
 		)
 	}
-	os.WriteFile("training_data.txt", buf.Bytes(), 0755)
+	os.WriteFile(absPath, buf.Bytes(), 0755)
 	return nil
 }
 
-func LoadFromJSON() ([]TsTrainingData, error) {
+// LoadFromJSON returns trained data from a specified file.
+// If read fails, then returns an empty array with error
+func LoadFromJSON(absPath string) ([]TsTrainingData, error) {
 	tData := []TsTrainingData{}
-	f, err := os.Open("training_data.txt")
+	f, err := os.Open(absPath)
 	if err != nil {
 		return []TsTrainingData{}, err
 	}
@@ -70,14 +72,16 @@ func LoadFromJSON() ([]TsTrainingData, error) {
 	return tData, nil
 }
 
-func SaveAsCSV(name string, data []TsTrainingData) error {
-	if name == "" {
+// SaveAsCSV takes a data and absolute path to a file
+// Returns err while something go bad.
+func SaveAsCSV(data []TsTrainingData, absPath string) error {
+	if absPath == "" {
 		return fmt.Errorf("no name specified")
 	}
 	if len(data) == 0 {
 		return fmt.Errorf("no data provided")
 	}
-	f, err := os.Create(os.TempDir() + "/" + name)
+	f, err := os.Create(absPath)
 	if err != nil {
 		return fmt.Errorf(
 			"could not create tmp file : %s", err.Error(),
@@ -112,6 +116,9 @@ func SaveAsCSV(name string, data []TsTrainingData) error {
 }
 
 // ReadFromCSV reads from given path, and returns Training data
+// It takes absPath and info if contains header
+// Returns array of training data.
+// If something go bad, then returns an empty array with error
 func ReadFromCSV(absPath string, containsHeader bool) ([]TsTrainingData, error) {
 	trainingData := []TsTrainingData{}
 	if absPath == "" {

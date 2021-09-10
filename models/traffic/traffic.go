@@ -50,6 +50,7 @@ func ParseFromJSONFile(jsonFileAbsPath string) ([]Traffic, error) {
 	return traffic, nil
 }
 
+// ParseFromJSONString takes a json string value and returns parsed traffic and error
 func ParseFromJSONString(JSONStr string) ([]Traffic, error) {
 	traffic := []Traffic{}
 	if len(JSONStr) == 0 {

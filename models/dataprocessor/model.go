@@ -25,6 +25,7 @@ func New(fileName string) (*DataProcessor, error) {
 	}, nil
 }
 
+// Initialize parses a training data, make prediction and returns float64 - accurancy, and error
 func (dp *DataProcessor) Initialize() (float64, error) {
 	rawData, err := base.ParseCSVToInstances(dp.trainingFileName, true)
 	if err != nil {
@@ -50,6 +51,10 @@ func (dp *DataProcessor) Initialize() (float64, error) {
 	return accurancy, nil
 }
 
+// Estimate takes a data that needs to be predicted, and returns labeled prediction
+// Warning: The data should have filled column "estimated_behaviour"  with values cryptojacking and nocryptojacking
+// This values won't be taken into account (has no impact on prediction results), an library that makes prediction
+// returns an err while this column is empty or have only one of this values
 func (dp *DataProcessor) Estimate(absPathToCSVFile string) ([]string, error) {
 	results := []string{}
 	if dp.classifier == nil {

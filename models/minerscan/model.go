@@ -12,6 +12,8 @@ type MinerScanner struct {
 	wordList *wordlist.WordList
 }
 
+// New(wordList *wordlist.WordList) that returns only MinnerScanner client
+// It reads data from WordList
 func New(wordList *wordlist.WordList) *MinerScanner {
 	return &MinerScanner{
 		wordList: wordList,

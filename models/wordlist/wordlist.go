@@ -19,6 +19,8 @@ const (
 	statusResponse switchFlag = "res"
 )
 
+// ParseFromFile takes absPath to a file, and returns pointer to a wordlist
+// If something go bad, then returns nil with error
 func ParseFromFile(absPath string) (*WordList, error) {
 	var flag switchFlag
 	wList := WordList{
