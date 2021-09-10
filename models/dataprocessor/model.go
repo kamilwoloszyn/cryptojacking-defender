@@ -15,13 +15,14 @@ type DataProcessor struct {
 	classifier       *knn.KNNClassifier
 }
 
-// New creates a new instance of Dataprocessor. A given filename must exist in the same catalog where this file is.
-func New(fileName string) (*DataProcessor, error) {
-	if fileName == "" {
+// New creates a new instance of Dataprocessor.
+// It takes a training file as an argument.
+func New(trainingAbsFilePath string) (*DataProcessor, error) {
+	if trainingAbsFilePath == "" {
 		return nil, fmt.Errorf("file name should not be empty")
 	}
 	return &DataProcessor{
-		trainingFileName: fileName,
+		trainingFileName: trainingAbsFilePath,
 	}, nil
 }
 
@@ -45,9 +46,6 @@ func (dp *DataProcessor) Initialize() (float64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("initialize(): couldn't get accurancy of your model: %s", err.Error())
 	}
-	// if accurancy < 0.7 {
-	// 	log.Printf("[warning]: accurancy of your model is below 0.7. Expect false positive results.")
-	// }
 	return accurancy, nil
 }
 
