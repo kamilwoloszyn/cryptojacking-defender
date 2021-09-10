@@ -34,7 +34,6 @@ type Traffic struct {
 }
 
 // ParseFromJSON loads a traffic from a text file, which contains json struct
-// terminal command tshark -r traffic.pcap -o "tls.keylog_file: keys2.txt" -Y tls -Px -T json -e ip.src -e ip.dst -e tls.record.content_type -e data-text-lines -e tls.record.content_type -e frame.number -e frame.len -e frame.time -e frame.time_relative -e text
 func ParseFromJSONFile(jsonFileAbsPath string) ([]Traffic, error) {
 	traffic := []Traffic{}
 	if len(jsonFileAbsPath) == 0 {
