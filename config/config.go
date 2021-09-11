@@ -6,6 +6,6 @@ type Config struct {
 	BrowserSSLFilePath            string `env:"BROWSER_SSL_FILE_PATH" envDefault:"/tmp/keys.txt"`
 	ProjectRootPath               string `env:"CD_PATH_PROJECT" envDefault:"/home/kamil/Projects/cryptojacking-defender"`
 	ExternalServicesDecryptedJSON string `env:"CD_PATH_PROJECT_EXTERNAL" envDefault:"/tmp/decrypted_json.txt"`
-	TrainingCSVPath               string `env:"CD_PATH_PROJECT_RELATIVE_CSVMODEL" envDefault:"/models/dataprocessor/traffic_data.csv"`
+	TrainingCSVPathRelative       string `env:"CD_PATH_PROJECT_RELATIVE_CSVMODEL" envDefault:"/models/dataprocessor/traffic_data.csv"`
 	CSVToPredict                  string `env:"CD_PATH_DATA_PREDICT" envDefault:"/tmp/predict.csv"`
 }
