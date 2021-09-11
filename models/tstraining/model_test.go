@@ -271,35 +271,44 @@ func TestSaveAsJSON(t *testing.T) {
 
 func TestSaveReadCSV(t *testing.T) {
 	testCases := []struct {
-		desc        string
-		arg         []tstraining.TsTrainingData
+		desc string
+		arg  struct {
+			data       []tstraining.TsTrainingData
+			containsIP bool
+		}
 		expected    []tstraining.TsTrainingData
 		wantSaveErr bool
 		wantReadErr bool
 	}{
 		{
-			desc: "Correct data",
-			arg: []tstraining.TsTrainingData{
-				{
-					SentMaliciousPacketRatio: 0,
-					RecvMaliciousPacketRatio: 0,
-					AvgGapSentRT:             0.006806,
-					AvgGapRecvRT:             3.379272000,
-					AvgLenSentFrame:          422.6667,
-					AvgLenRecvFrame:          97.0,
-					SendRecvRatio:            3.0,
-					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
+			desc: "Correct data without ip",
+			arg: struct {
+				data       []tstraining.TsTrainingData
+				containsIP bool
+			}{
+				data: []tstraining.TsTrainingData{
+					{
+						SentMaliciousPacketRatio: 0,
+						RecvMaliciousPacketRatio: 0,
+						AvgGapSentRT:             0.006806,
+						AvgGapRecvRT:             3.379272000,
+						AvgLenSentFrame:          422.6667,
+						AvgLenRecvFrame:          97.0,
+						SendRecvRatio:            3.0,
+						ConsideredAs:             base.FieldNonCryptoJackingBehavior,
+					},
+					{
+						SentMaliciousPacketRatio: 1,
+						RecvMaliciousPacketRatio: 0,
+						AvgGapSentRT:             3.395833000,
+						AvgGapRecvRT:             0,
+						AvgLenSentFrame:          583,
+						AvgLenRecvFrame:          0,
+						SendRecvRatio:            0,
+						ConsideredAs:             base.FieldNonCryptoJackingBehavior,
+					},
 				},
-				{
-					SentMaliciousPacketRatio: 1,
-					RecvMaliciousPacketRatio: 0,
-					AvgGapSentRT:             3.395833000,
-					AvgGapRecvRT:             0,
-					AvgLenSentFrame:          583,
-					AvgLenRecvFrame:          0,
-					SendRecvRatio:            0,
-					ConsideredAs:             base.FieldNonCryptoJackingBehavior,
-				},
+				containsIP: false,
 			},
 			expected: []tstraining.TsTrainingData{
 				{
@@ -328,7 +337,7 @@ func TestSaveReadCSV(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if err := tstraining.SaveAsCSV(tC.arg, pathToCSVFile); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
+			if err := tstraining.SaveAsCSV(tC.arg.data, pathToCSVFile, tC.arg.containsIP); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
 				t.Fatalf(
 					"Got err: %v, but expected to be %v", err.Error(), tC.wantReadErr,
 				)
