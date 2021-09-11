@@ -7,4 +7,5 @@ type Config struct {
 	ProjectRootPath               string `env:"CD_PATH_PROJECT" envDefault:"/home/kamil/Projects/cryptojacking-defender"`
 	ExternalServicesDecryptedJSON string `env:"CD_PATH_PROJECT_EXTERNAL" envDefault:"/tmp/decrypted_json.txt"`
 	TrainingCSVPath               string `env:"CD_PATH_PROJECT_RELATIVE_CSVMODEL" envDefault:"/models/dataprocessor/traffic_data.csv"`
+	CSVToPredict                  string `env:"CD_PATH_DATA_PREDICT" envDefault:"/tmp/predict.csv"`
 }
