@@ -109,6 +109,7 @@ func SaveAsCSV(data []TsTrainingData, absPath string) error {
 			fmt.Sprintf("%f", trainingDataItem.AvgLenSentFrame),
 			fmt.Sprintf("%f", trainingDataItem.AvgLenRecvFrame),
 			fmt.Sprintf("%f", trainingDataItem.SendRecvRatio),
+			string(trainingDataItem.ConsideredAs),
 		})
 	}
 	writer.WriteAll(records)
