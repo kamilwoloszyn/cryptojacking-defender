@@ -59,20 +59,24 @@ func main() {
 	}
 	// Training and learning
 	trainingData := appModules.GenerateTrainingData(&trafficStatistic)
+
 	accurancy, err := appModules.DataProcessor().Initialize()
 	if err != nil {
-		log.Printf("[FATAL]:Couldn't initialize data processor: %s\n", err.Error())
-		appModules.SaveTrainingData(trainingData, cfg.TrainingCSVPath)
-		log.Printf("[INFO]:Nothing to do left. Your train data was saved to: %s\n", cfg.TrainingCSVPath)
+		log.Printf("[INFO]:Couldn't initialize data processor: %s\n", err.Error())
+		err := appModules.SaveTrainingData(trainingData, cfg.ProjectRootPath+cfg.TrainingCSVPathRelative, true)
+		if err != nil {
+			log.Fatalf("[FATAL]: Couldn't save training data: %s", err.Error())
+		}
+		log.Printf("[INFO]:Nothing to do left. Your train data was saved to: %s\n", cfg.ProjectRootPath+cfg.TrainingCSVPathRelative)
 		os.Exit(0)
 	}
-	log.Printf("[INFO]:Accurancy: %f", accurancy)
-	appModules.SaveTrainingData(trainingData, cfg.CSVToPredict)
+	log.Printf("[INFO]:Accurancy of trained model: %f", accurancy)
+	appModules.SaveTrainingData(trainingData, cfg.CSVToPredict, false)
 	result, err := appModules.DataProcessor().Estimate(cfg.CSVToPredict)
 	if err != nil {
 		log.Fatalf("[FATAL]:Couldn't predict a given data: %s", err.Error())
 	}
-	log.Printf("[INFO]: Got results: %v", result)
+	log.Printf("[INFO]: Got results: %v \n", result)
 	log.Println("[INFO]: Cleaning files ...")
 	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath)
 
