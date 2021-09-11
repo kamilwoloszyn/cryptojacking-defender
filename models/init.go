@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	WordlistPath = "/static/wordlist/.txt"
+	WordlistPath = "/static/wordlist.txt"
 )
 
 // AppModules contains initialization modules, other modules that cannot be save in this struct has separate methods.
