@@ -16,6 +16,7 @@ import (
 // Fields description:
 // - SentMaliciousPacketRatio, RecvMaliciousPacketRatio - Ratio
 type TsTrainingData struct {
+	HostsIP                  base.BaseIP
 	SentMaliciousPacketRatio float32
 	RecvMaliciousPacketRatio float32
 	AvgGapSentRT             float32
@@ -27,11 +28,23 @@ type TsTrainingData struct {
 	EstimatedBehaviour       base.CryptoJackingState
 }
 
+var baseCols = []string{
+	"sent_malicious_packet_ratio",
+	"recv_malicious_packet_ratio",
+	"avg_gap_sent_rt",
+	"avg_gap_recv_rt",
+	"avg_len_sent_frame",
+	"avg_len_recv_frame",
+	"send_recv_ratio",
+	"estimated_behaviour",
+}
+
 // Extract extracts training data from PacketFlow struct
 func Extract(trafficStats *[]packetflow.TrafficStatistic) []TsTrainingData {
 	var trainingData []TsTrainingData
 	for _, trafficItem := range *trafficStats {
 		trainingData = append(trainingData, TsTrainingData{
+			HostsIP:                  trafficItem.Base,
 			SentMaliciousPacketRatio: getMaliciousPacketRatio(trafficItem.MaliciusTrafficStatistic.SentKeywords, trafficItem.SendQty),
 			RecvMaliciousPacketRatio: getMaliciousPacketRatio(trafficItem.MaliciusTrafficStatistic.RecvKeywords, trafficItem.RecvQty),
 			AvgGapSentRT:             getAvgGapRT(trafficItem.FramesSendRelativeTime),
@@ -74,7 +87,8 @@ func LoadFromJSON(absPath string) ([]TsTrainingData, error) {
 
 // SaveAsCSV takes a data and absolute path to a file
 // Returns err while something go bad.
-func SaveAsCSV(data []TsTrainingData, absPath string) error {
+// If csv contains IP addr, then should not be used for training model, only for user pourpose
+func SaveAsCSV(data []TsTrainingData, absPath string, containsIP bool) error {
 	if absPath == "" {
 		return fmt.Errorf("no name specified")
 	}
@@ -84,33 +98,48 @@ func SaveAsCSV(data []TsTrainingData, absPath string) error {
 	f, err := os.Create(absPath)
 	if err != nil {
 		return fmt.Errorf(
-			"could not create tmp file : %s", err.Error(),
+			"could not create a file : %s", err.Error(),
 		)
 	}
 	writer := csv.NewWriter(f)
 	records := [][]string{
-		{
-			"sent_malicious_packet_ratio",
-			"recv_malicious_packet_ratio",
-			"avg_gap_sent_rt",
-			"avg_gap_recv_rt",
-			"avg_len_sent_frame",
-			"avg_len_recv_frame",
-			"send_recv_ratio",
-			"estimated_behaviour",
-		},
+		baseCols,
 	}
-	for _, trainingDataItem := range data {
-		records = append(records, []string{
-			fmt.Sprintf("%f", trainingDataItem.SentMaliciousPacketRatio),
-			fmt.Sprintf("%f", trainingDataItem.RecvMaliciousPacketRatio),
-			fmt.Sprintf("%f", trainingDataItem.AvgGapSentRT),
-			fmt.Sprintf("%f", trainingDataItem.AvgGapRecvRT),
-			fmt.Sprintf("%f", trainingDataItem.AvgLenSentFrame),
-			fmt.Sprintf("%f", trainingDataItem.AvgLenRecvFrame),
-			fmt.Sprintf("%f", trainingDataItem.SendRecvRatio),
-			string(trainingDataItem.ConsideredAs),
-		})
+	if containsIP {
+		cols := append(baseCols, []string{"src_ip", "dst_ip"}...)
+		records = [][]string{
+			cols,
+		}
+	}
+	if containsIP {
+		for _, trainingDataItem := range data {
+			records = append(records, []string{
+				fmt.Sprintf("%f", trainingDataItem.SentMaliciousPacketRatio),
+				fmt.Sprintf("%f", trainingDataItem.RecvMaliciousPacketRatio),
+				fmt.Sprintf("%f", trainingDataItem.AvgGapSentRT),
+				fmt.Sprintf("%f", trainingDataItem.AvgGapRecvRT),
+				fmt.Sprintf("%f", trainingDataItem.AvgLenSentFrame),
+				fmt.Sprintf("%f", trainingDataItem.AvgLenRecvFrame),
+				fmt.Sprintf("%f", trainingDataItem.SendRecvRatio),
+				string(trainingDataItem.ConsideredAs),
+				string(trainingDataItem.HostsIP.SrcIP),
+				string(trainingDataItem.HostsIP.DstIP),
+			})
+		}
+	} else {
+		for _, trainingDataItem := range data {
+			records = append(records, []string{
+				fmt.Sprintf("%f", trainingDataItem.SentMaliciousPacketRatio),
+				fmt.Sprintf("%f", trainingDataItem.RecvMaliciousPacketRatio),
+				fmt.Sprintf("%f", trainingDataItem.AvgGapSentRT),
+				fmt.Sprintf("%f", trainingDataItem.AvgGapRecvRT),
+				fmt.Sprintf("%f", trainingDataItem.AvgLenSentFrame),
+				fmt.Sprintf("%f", trainingDataItem.AvgLenRecvFrame),
+				fmt.Sprintf("%f", trainingDataItem.SendRecvRatio),
+				string(trainingDataItem.ConsideredAs),
+			})
+		}
+
 	}
 	writer.WriteAll(records)
 	return nil
@@ -120,6 +149,7 @@ func SaveAsCSV(data []TsTrainingData, absPath string) error {
 // It takes absPath and info if contains header
 // Returns array of training data.
 // If something go bad, then returns an empty array with error
+// Not suitable for reading model that contain IP fields, only for trained model ready for production !
 func ReadFromCSV(absPath string, containsHeader bool) ([]TsTrainingData, error) {
 	trainingData := []TsTrainingData{}
 	if absPath == "" {
