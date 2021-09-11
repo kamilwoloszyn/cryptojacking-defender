@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/caarlos0/env"
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/chrome"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/tcpdump"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/tshark"
+	"github.com/kamilwoloszyn/cryptojacking-defender/external"
+	"github.com/kamilwoloszyn/cryptojacking-defender/models"
 	"github.com/kamilwoloszyn/cryptojacking-defender/utils/cleanup"
 )
 
@@ -25,25 +25,54 @@ func main() {
 	}
 	log.Println("[INFO]: Config loaded succesfully")
 	tcpDumpCtx, cancelTcpDump := context.WithCancel(ctx)
-	tcpDump := tcpdump.New(cfg.NetworkInterface, cfg.TcpDumpFilePath)
+
+	appModules, err := models.InitializeModules(&cfg, &wg)
+	if err != nil {
+		log.Fatalf("[FATAL]:Couldn't initialize some of internal modules: %s ", err.Error())
+	}
+	externalServices := external.Inititalize(&cfg)
+
+	// Capturing, decrypting traffic procedure
 	log.Println("[INFO]: Starting capturing ...\n [WARNING]: Password may be required for sudo")
-	tcpDump.Capture(tcpDumpCtx, &wg)
+	externalServices.TcpDump().Capture(tcpDumpCtx, &wg)
 	log.Println("[INFO]: Waiting for a browser .. ")
-	chromeBrowser := chrome.New(cfg.BrowserSSLFilePath)
-	if err := chromeBrowser.Run(); err != nil {
+	if err := externalServices.Chrome().Run(); err != nil {
 		log.Fatalf("[FATAL]: Couldn't run chrome browser: %s. Exiting.", err)
 	}
 	log.Println("[INFO]: Browser closed. Looking for dump program ...")
 	cancelTcpDump()
 	wg.Wait()
 	log.Println("[INFO]: Fixing corrupted package ...")
-	tcpDump.FixBrokenPackage(ctx)
-	tsharkClient := tshark.New(cfg.BrowserSSLFilePath)
+	externalServices.TcpDump().FixBrokenPackage(ctx)
 	log.Println("[INFO]: Decrypting traffic ...")
-	if err := tsharkClient.Decrypt(cfg.TcpDumpFilePath); err != nil {
-		log.Fatalf("[FATAL]: Cannot open decryption program: %s", err)
+	if err := externalServices.Tshark().Decrypt(cfg.TcpDumpFilePath, cfg.ExternalServicesDecryptedJSON); err != nil {
+		log.Fatalf("[FATAL]: Couldn't open decryption program: %s\n", err)
 	}
-	//cleanup
+	// Processing data
+	rawTraffic, err := appModules.ParseTrafficFromJSONFile(cfg.ExternalServicesDecryptedJSON)
+	if err != nil {
+		log.Fatalf("[FATAL]:ParseTrafficFromJSONFile: %s\n", err.Error())
+	}
+	trafficStatistic, err := appModules.GenerateTrafficStatistcs(&rawTraffic)
+	if err != nil {
+		log.Fatalf("[FATAL]:GenerateTrafficStatistcs: %s\n", err.Error())
+	}
+	// Training and learning
+	trainingData := appModules.GenerateTrainingData(&trafficStatistic)
+	accurancy, err := appModules.DataProcessor().Initialize()
+	if err != nil {
+		log.Printf("[FATAL]:Couldn't initialize data processor: %s\n", err.Error())
+		appModules.SaveTrainingData(trainingData, cfg.TrainingCSVPath)
+		log.Printf("[INFO]:Nothing to do left. Your train data was saved to: %s\n", cfg.TrainingCSVPath)
+		os.Exit(0)
+	}
+	log.Printf("[INFO]:Accurancy: %f", accurancy)
+	appModules.SaveTrainingData(trainingData, cfg.CSVToPredict)
+	result, err := appModules.DataProcessor().Estimate(cfg.CSVToPredict)
+	if err != nil {
+		log.Fatalf("[FATAL]:Couldn't predict a given data: %s", err.Error())
+	}
+	log.Printf("[INFO]: Got results: %v", result)
 	log.Println("[INFO]: Cleaning files ...")
 	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath)
 
