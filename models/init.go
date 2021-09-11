@@ -28,7 +28,7 @@ func InitializeModules(cfg *config.Config, wg *sync.WaitGroup) (AppModules, erro
 	if err != nil {
 		return AppModules{}, err
 	}
-	dataProcessor, err := dataprocessor.New(cfg.ProjectRootPath + cfg.TrainingCSVPath)
+	dataProcessor, err := dataprocessor.New(cfg.ProjectRootPath + cfg.TrainingCSVPathRelative)
 	if err != nil {
 		return AppModules{}, err
 	}
@@ -65,8 +65,8 @@ func (a *AppModules) GenerateTrainingData(trafficStats *[]packetflow.TrafficStat
 	return tstraining.Extract(trafficStats)
 }
 
-func (a *AppModules) SaveTrainingData(data []tstraining.TsTrainingData, absPath string) error {
-	return tstraining.SaveAsCSV(data, absPath)
+func (a *AppModules) SaveTrainingData(data []tstraining.TsTrainingData, absPath string, containsIP bool) error {
+	return tstraining.SaveAsCSV(data, absPath, containsIP)
 }
 
 func (a *AppModules) ReadFromCSV(absPath string, containsHeader bool) ([]tstraining.TsTrainingData, error) {
