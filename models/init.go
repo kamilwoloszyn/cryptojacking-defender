@@ -65,8 +65,8 @@ func (a *AppModules) GenerateTrainingData(trafficStats *[]packetflow.TrafficStat
 	return tstraining.Extract(trafficStats)
 }
 
-func (a *AppModules) SaveTrainingData(data []tstraining.TsTrainingData, absPath string, containsIP bool) error {
-	return tstraining.SaveAsCSV(data, absPath, containsIP)
+func (a *AppModules) SaveTrainingData(data []tstraining.TsTrainingData, absPath string, containsIP, isForPrediction bool) error {
+	return tstraining.SaveAsCSV(data, absPath, containsIP, isForPrediction)
 }
 
 func (a *AppModules) ReadFromCSV(absPath string, containsHeader bool) ([]tstraining.TsTrainingData, error) {
