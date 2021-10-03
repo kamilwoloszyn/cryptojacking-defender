@@ -88,7 +88,7 @@ func LoadFromJSON(absPath string) ([]TsTrainingData, error) {
 // SaveAsCSV takes a data and absolute path to a file
 // Returns err while something go bad.
 // If csv contains IP addr, then should not be used for training model, only for user pourpose
-func SaveAsCSV(data []TsTrainingData, absPath string, containsIP bool) error {
+func SaveAsCSV(data []TsTrainingData, absPath string, containsIP, forPrediction bool) error {
 	if absPath == "" {
 		return fmt.Errorf("no name specified")
 	}
@@ -100,6 +100,11 @@ func SaveAsCSV(data []TsTrainingData, absPath string, containsIP bool) error {
 		return fmt.Errorf(
 			"could not create a file : %s", err.Error(),
 		)
+	}
+	// It solves "Incopatible attrs while loading a dataset for prediction "
+	if forPrediction {
+		data[0].ConsideredAs = "nocryptojacking"
+		data[1].ConsideredAs = "cryptojacking"
 	}
 	writer := csv.NewWriter(f)
 	records := [][]string{
