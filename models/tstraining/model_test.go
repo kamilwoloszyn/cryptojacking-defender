@@ -273,8 +273,9 @@ func TestSaveReadCSV(t *testing.T) {
 	testCases := []struct {
 		desc string
 		arg  struct {
-			data       []tstraining.TsTrainingData
-			containsIP bool
+			data          []tstraining.TsTrainingData
+			containsIP    bool
+			forPrediction bool
 		}
 		expected    []tstraining.TsTrainingData
 		wantSaveErr bool
@@ -283,8 +284,9 @@ func TestSaveReadCSV(t *testing.T) {
 		{
 			desc: "Correct data without ip",
 			arg: struct {
-				data       []tstraining.TsTrainingData
-				containsIP bool
+				data          []tstraining.TsTrainingData
+				containsIP    bool
+				forPrediction bool
 			}{
 				data: []tstraining.TsTrainingData{
 					{
@@ -308,7 +310,8 @@ func TestSaveReadCSV(t *testing.T) {
 						ConsideredAs:             base.FieldNonCryptoJackingBehavior,
 					},
 				},
-				containsIP: false,
+				containsIP:    false,
+				forPrediction: false,
 			},
 			expected: []tstraining.TsTrainingData{
 				{
@@ -337,7 +340,7 @@ func TestSaveReadCSV(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if err := tstraining.SaveAsCSV(tC.arg.data, pathToCSVFile, tC.arg.containsIP); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
+			if err := tstraining.SaveAsCSV(tC.arg.data, pathToCSVFile, tC.arg.containsIP, tC.arg.forPrediction); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
 				t.Fatalf(
 					"Got err: %v, but expected to be %v", err.Error(), tC.wantReadErr,
 				)
