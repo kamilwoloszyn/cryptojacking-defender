@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
@@ -45,9 +46,16 @@ func main() {
 	log.Println("[INFO]: Fixing corrupted package ...")
 	externalServices.TcpDump().FixBrokenPackage(ctx)
 	log.Println("[INFO]: Decrypting traffic ...")
-	if err := externalServices.Tshark().Decrypt(cfg.TcpDumpFilePath, cfg.ExternalServicesDecryptedJSON); err != nil {
-		log.Fatalf("[FATAL]: Couldn't open decryption program: %s\n", err)
+	for i := 0; i < 5; i++ {
+		err := externalServices.Tshark().Decrypt(cfg.TcpDumpFilePath, cfg.ExternalServicesDecryptedJSON)
+		if err == nil {
+			break
+		}
+		log.Printf("[FATAL]: Couldn't open a decryption program: %s\n", err)
+		log.Printf("[INFO]: Probe %d/5 in 10 second ..\n", i+1)
+		time.Sleep(time.Second * 10)
 	}
+
 	// Processing data
 	rawTraffic, err := appModules.ParseTrafficFromJSONFile(cfg.ExternalServicesDecryptedJSON)
 	if err != nil {
@@ -63,7 +71,7 @@ func main() {
 	accurancy, err := appModules.DataProcessor().Initialize()
 	if err != nil {
 		log.Printf("[INFO]:Couldn't initialize data processor: %s\n", err.Error())
-		err := appModules.SaveTrainingData(trainingData, cfg.ProjectRootPath+cfg.TrainingCSVPathRelative, true)
+		err := appModules.SaveTrainingData(trainingData, cfg.ProjectRootPath+cfg.TrainingCSVPathRelative, true, false)
 		if err != nil {
 			log.Fatalf("[FATAL]: Couldn't save training data: %s", err.Error())
 		}
@@ -71,13 +79,13 @@ func main() {
 		os.Exit(0)
 	}
 	log.Printf("[INFO]:Accurancy of trained model: %f", accurancy)
-	appModules.SaveTrainingData(trainingData, cfg.CSVToPredict, false)
+	appModules.SaveTrainingData(trainingData, cfg.CSVToPredict, false, true)
 	result, err := appModules.DataProcessor().Estimate(cfg.CSVToPredict)
 	if err != nil {
 		log.Fatalf("[FATAL]:Couldn't predict a given data: %s", err.Error())
 	}
-	log.Printf("[INFO]: Got results: %v \n", result)
+	appModules.DataProcessor().PrintStatistic(trainingData, result)
 	log.Println("[INFO]: Cleaning files ...")
-	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath)
+	cleanup.RemoveAsCurrentUser(cfg.BrowserSSLFilePath, cfg.TcpDumpFilePath, cfg.CSVToPredict, cfg.ExternalServicesDecryptedJSON)
 
 }
