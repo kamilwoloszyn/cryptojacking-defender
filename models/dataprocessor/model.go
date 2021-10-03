@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kamilwoloszyn/cryptojacking-defender/models/tstraining"
 	"github.com/sjwhitworth/golearn/base"
 	"github.com/sjwhitworth/golearn/evaluation"
 	"github.com/sjwhitworth/golearn/knn"
@@ -71,6 +72,22 @@ func (dp *DataProcessor) Estimate(absPathToCSVFile string) ([]string, error) {
 		results = append(results, prediction.RowString(i))
 	}
 	return results, nil
+}
+
+func (dp *DataProcessor) PrintStatistic(trafficStats []tstraining.TsTrainingData, resultLabels []string) {
+	if len(trafficStats) == len(resultLabels) && len(trafficStats) > 0 {
+		var cryptojackingCount int
+		for k, v := range trafficStats {
+			if resultLabels[k] != "cryptojacking" {
+				fmt.Printf("\n%s -> %s OK", v.HostsIP.SrcIP, v.HostsIP.DstIP)
+			} else {
+				fmt.Printf("\n%s -> %s FOUND CRYPTOJACKING\n", v.HostsIP.SrcIP, v.HostsIP.DstIP)
+				cryptojackingCount++
+			}
+		}
+		fmt.Printf("\nFound %d cryptojacking connections and %d nocryptojacking connections\n", cryptojackingCount, len(trafficStats)-cryptojackingCount)
+	}
+
 }
 
 func (dp *DataProcessor) parseData(rawData *base.DenseInstances) (*base.FixedDataGrid, error) {
