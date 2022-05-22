@@ -1,10 +1,10 @@
-package external
+package adapter
 
 import (
+	"github.com/kamilwoloszyn/cryptojacking-defender/adapter/chrome"
+	"github.com/kamilwoloszyn/cryptojacking-defender/adapter/tcpdump"
+	"github.com/kamilwoloszyn/cryptojacking-defender/adapter/tshark"
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/chrome"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/tcpdump"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external/tshark"
 )
 
 type ExternalServices struct {

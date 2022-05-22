@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/minerscan"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/wordlist"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/minerscan"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/wordlist"
 )
 
 func TestScan(t *testing.T) {

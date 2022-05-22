@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/caarlos0/env"
+	"github.com/kamilwoloszyn/cryptojacking-defender/adapter"
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
-	"github.com/kamilwoloszyn/cryptojacking-defender/external"
 	"github.com/kamilwoloszyn/cryptojacking-defender/models"
 	"github.com/kamilwoloszyn/cryptojacking-defender/utils/cleanup"
 )
@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("[FATAL]:Couldn't initialize some of internal modules: %s ", err.Error())
 	}
-	externalServices := external.Inititalize(&cfg)
+	externalServices := adapter.Inititalize(&cfg)
 
 	// Capturing, decrypting traffic procedure
 	log.Println("[INFO]: Starting capturing ...\n [WARNING]: Password may be required for sudo")

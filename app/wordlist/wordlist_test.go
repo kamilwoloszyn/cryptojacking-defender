@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/wordlist"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/wordlist"
 )
 
 func TestParseWordlistFromFile(t *testing.T) {
@@ -40,8 +40,8 @@ func TestParseWordlistFromFile(t *testing.T) {
 	for i, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			if result, err := wordlist.ParseFromFile(tC.arg); !reflect.DeepEqual(result, tC.expected) {
-				t.Error(
-					fmt.Sprintf("Got %v, but expected %v with err :%s", result, tC.expected, err.Error()),
+				t.Errorf(
+					"Got %v, but expected %v with err :%s", result, tC.expected, err.Error(),
 				)
 			}
 			fmt.Printf("[%d/%d]: Success\n", i+1, len(testCases))

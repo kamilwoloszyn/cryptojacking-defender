@@ -1,15 +1,16 @@
-package models
+package app
 
 import (
 	"sync"
 
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/dataprocessor"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/minerscan"
+	packetflow "github.com/kamilwoloszyn/cryptojacking-defender/app/packet-flow"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/tstraining"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/wordlist"
 	"github.com/kamilwoloszyn/cryptojacking-defender/config"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/dataprocessor"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/minerscan"
-	packetflow "github.com/kamilwoloszyn/cryptojacking-defender/models/packet-flow"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/tstraining"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/wordlist"
+	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
 
 const (
@@ -57,18 +58,18 @@ func (a *AppModules) ParseTrafficFromJSONFile(jsonFileAbsPath string) ([]traffic
 	return traffic.ParseFromJSONFile(jsonFileAbsPath)
 }
 
-func (a *AppModules) GenerateTrafficStatistcs(traffic *[]traffic.Traffic) ([]packetflow.TrafficStatistic, error) {
+func (a *AppModules) GenerateTrafficStatistcs(traffic *[]traffic.Traffic) ([]domain.TrafficStatistic, error) {
 	return packetflow.Generate(traffic, a.minerscanner)
 }
 
-func (a *AppModules) GenerateTrainingData(trafficStats *[]packetflow.TrafficStatistic) []tstraining.TsTrainingData {
+func (a *AppModules) GenerateTrainingData(trafficStats *[]domain.TrafficStatistic) []domain.TsTrainingData {
 	return tstraining.Extract(trafficStats)
 }
 
-func (a *AppModules) SaveTrainingData(data []tstraining.TsTrainingData, absPath string, containsIP, isForPrediction bool) error {
+func (a *AppModules) SaveTrainingData(data []domain.TsTrainingData, absPath string, containsIP, isForPrediction bool) error {
 	return tstraining.SaveAsCSV(data, absPath, containsIP, isForPrediction)
 }
 
-func (a *AppModules) ReadFromCSV(absPath string, containsHeader bool) ([]tstraining.TsTrainingData, error) {
+func (a *AppModules) ReadFromCSV(absPath string, containsHeader bool) ([]domain.TsTrainingData, error) {
 	return tstraining.ReadFromCSV(absPath, containsHeader)
 }

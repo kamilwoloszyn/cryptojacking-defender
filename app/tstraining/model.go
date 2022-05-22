@@ -8,25 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/base"
-	packetflow "github.com/kamilwoloszyn/cryptojacking-defender/models/packet-flow"
+	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
-
-// TsLearningData contains all data needed to machine learning
-// Fields description:
-// - SentMaliciousPacketRatio, RecvMaliciousPacketRatio - Ratio
-type TsTrainingData struct {
-	HostsIP                  base.BaseIP
-	SentMaliciousPacketRatio float32
-	RecvMaliciousPacketRatio float32
-	AvgGapSentRT             float32
-	AvgGapRecvRT             float32
-	AvgLenSentFrame          float32
-	AvgLenRecvFrame          float32
-	SendRecvRatio            float32
-	ConsideredAs             base.CryptoJackingState
-	EstimatedBehaviour       base.CryptoJackingState
-}
 
 var baseCols = []string{
 	"sent_malicious_packet_ratio",
@@ -40,10 +23,10 @@ var baseCols = []string{
 }
 
 // Extract extracts training data from PacketFlow struct
-func Extract(trafficStats *[]packetflow.TrafficStatistic) []TsTrainingData {
-	var trainingData []TsTrainingData
+func Extract(trafficStats *[]domain.TrafficStatistic) []domain.TsTrainingData {
+	var trainingData []domain.TsTrainingData
 	for _, trafficItem := range *trafficStats {
-		trainingData = append(trainingData, TsTrainingData{
+		trainingData = append(trainingData, domain.TsTrainingData{
 			HostsIP:                  trafficItem.Base,
 			SentMaliciousPacketRatio: getMaliciousPacketRatio(trafficItem.MaliciusTrafficStatistic.SentKeywords, trafficItem.SendQty),
 			RecvMaliciousPacketRatio: getMaliciousPacketRatio(trafficItem.MaliciusTrafficStatistic.RecvKeywords, trafficItem.RecvQty),
@@ -59,7 +42,7 @@ func Extract(trafficStats *[]packetflow.TrafficStatistic) []TsTrainingData {
 }
 
 // SaveAsJSON saves training data into a txt file
-func SaveAsJSON(data *[]TsTrainingData, absPath string) error {
+func SaveAsJSON(data *[]domain.TsTrainingData, absPath string) error {
 	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(data); err != nil {
 		return fmt.Errorf(
@@ -72,15 +55,15 @@ func SaveAsJSON(data *[]TsTrainingData, absPath string) error {
 
 // LoadFromJSON returns trained data from a specified file.
 // If read fails, then returns an empty array with error
-func LoadFromJSON(absPath string) ([]TsTrainingData, error) {
-	tData := []TsTrainingData{}
+func LoadFromJSON(absPath string) ([]domain.TsTrainingData, error) {
+	tData := []domain.TsTrainingData{}
 	f, err := os.Open(absPath)
 	if err != nil {
-		return []TsTrainingData{}, err
+		return []domain.TsTrainingData{}, err
 	}
 	err = json.NewDecoder(f).Decode(&tData)
 	if err != nil {
-		return []TsTrainingData{}, err
+		return []domain.TsTrainingData{}, err
 	}
 	return tData, nil
 }
@@ -88,7 +71,7 @@ func LoadFromJSON(absPath string) ([]TsTrainingData, error) {
 // SaveAsCSV takes a data and absolute path to a file
 // Returns err while something go bad.
 // If csv contains IP addr, then should not be used for training model, only for user pourpose
-func SaveAsCSV(data []TsTrainingData, absPath string, containsIP, forPrediction bool) error {
+func SaveAsCSV(data []domain.TsTrainingData, absPath string, containsIP, forPrediction bool) error {
 	if absPath == "" {
 		return fmt.Errorf("no name specified")
 	}
@@ -155,8 +138,8 @@ func SaveAsCSV(data []TsTrainingData, absPath string, containsIP, forPrediction 
 // Returns array of training data.
 // If something go bad, then returns an empty array with error
 // Not suitable for reading model that contain IP fields, only for trained model ready for production !
-func ReadFromCSV(absPath string, containsHeader bool) ([]TsTrainingData, error) {
-	trainingData := []TsTrainingData{}
+func ReadFromCSV(absPath string, containsHeader bool) ([]domain.TsTrainingData, error) {
+	trainingData := []domain.TsTrainingData{}
 	if absPath == "" {
 		return trainingData, fmt.Errorf("ReadFromCSV :path to file is empty")
 	}
@@ -193,7 +176,7 @@ func ReadFromCSV(absPath string, containsHeader bool) ([]TsTrainingData, error) 
 		if !ok {
 			return trainingData, fmt.Errorf("an error occured during parsing data (str -> float32)")
 		}
-		trainingData = append(trainingData, TsTrainingData{
+		trainingData = append(trainingData, domain.TsTrainingData{
 			SentMaliciousPacketRatio: float32(sentMalPacRatio),
 			RecvMaliciousPacketRatio: float32(recvMaliciousPacketRatio),
 			AvgGapSentRT:             float32(avgGapSentRT),
@@ -210,11 +193,11 @@ func ReadFromCSV(absPath string, containsHeader bool) ([]TsTrainingData, error) 
 // The function is based on SentMaliciousPacketRatio and RecvMaliciousPacketRatio data.
 // If this data are greater than 0, then cryptojacking value will be applied.
 // Due to simple alghoritm use this with careful.
-func autoCompleteCryptoJackingState(statItem *packetflow.TrafficStatistic) base.CryptoJackingState {
+func autoCompleteCryptoJackingState(statItem *domain.TrafficStatistic) domain.CryptoJackingState {
 	if statItem.MaliciusTrafficStatistic.RecvKeywords > 0 && statItem.MaliciusTrafficStatistic.SentKeywords > 0 {
-		return base.FieldCryptoJackingBehavior
+		return domain.FieldCryptoJackingBehavior
 	}
-	return base.FieldNonCryptoJackingBehavior
+	return domain.FieldNonCryptoJackingBehavior
 }
 
 func getSendRecvRatio(sentQty int, recvQty int) float32 {

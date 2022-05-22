@@ -1,4 +1,4 @@
-package base
+package domain
 
 // BaseIP contains src and dst IP
 type BaseIP struct {

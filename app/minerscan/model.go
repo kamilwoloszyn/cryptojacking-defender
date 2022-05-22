@@ -3,8 +3,8 @@ package minerscan
 import (
 	"strings"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/wordlist"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/wordlist"
 )
 
 // Minerscan scans for decrypted request/response to detect cryptomining activities
