@@ -7,8 +7,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Wordlist contains list of reqest or response pattern
 type WordList struct {
+	workingFile string
+}
+
+func NewWordList(absPathFile string) *WordList {
+	return &WordList{
+		workingFile: absPathFile,
+	}
+}
+
+// Wordlist contains list of reqest or response pattern
+type WordListResponse struct {
 	Req []string
 	Res []string
 }
@@ -21,9 +31,9 @@ const (
 
 // ParseFromFile takes absPath to a file, and returns pointer to a wordlist
 // If something go bad, then returns nil with error
-func ParseFromFile(absPath string) (*WordList, error) {
+func (w *WordList) ParseFromFile(absPath string) (*WordListResponse, error) {
 	var flag switchFlag
-	wList := WordList{
+	wList := WordListResponse{
 		Req: []string{},
 		Res: []string{},
 	}

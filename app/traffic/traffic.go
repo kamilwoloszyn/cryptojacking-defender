@@ -4,59 +4,48 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+
+	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
 
 type IPAddr string
 
-// Layers contains needed informations about packet.
-type Layers struct {
-	IPSrc             []string `json:"ip.src"`
-	IPDst             []string `json:"ip.dst"`
-	TLSContentType    []string `json:"tls.record.content_type"`
-	FrameNumber       []string `json:"frame.number"`
-	FrameLength       []string `json:"frame.len"`
-	FrameTime         []string `json:"frame.time"`
-	FrameTimeRelative []string `json:"frame.time_relative"`
-	TextData          []string `json:"text"`
+type TrafficParser struct {
+	workingFile string
 }
 
-// Source contains nested Layer body
-type Source struct {
-	Layers Layers `json:"layers"`
-}
-
-// Traffic contains all info about packet
-type Traffic struct {
-	Index       string  `json:"_index"`
-	TypeTraffic string  `json:"_type"`
-	Score       *string `json:"_score"`
-	Source      Source  `json:"_source"`
+func NewTrafficParser(
+	workingFile string,
+) *TrafficParser {
+	return &TrafficParser{
+		workingFile: workingFile,
+	}
 }
 
 // ParseFromJSON loads a traffic from a text file, which contains json struct
-func ParseFromJSONFile(jsonFileAbsPath string) ([]Traffic, error) {
-	traffic := []Traffic{}
-	if len(jsonFileAbsPath) == 0 {
-		return []Traffic{}, errors.New("empty file")
+func (t *TrafficParser) ParseFromJSONFile() ([]domain.Traffic, error) {
+	traffic := []domain.Traffic{}
+	if len(t.workingFile) == 0 {
+		return []domain.Traffic{}, errors.New("empty file")
 	}
-	file, err := os.Open(jsonFileAbsPath)
+	file, err := os.Open(t.workingFile)
 	if err != nil {
-		return []Traffic{}, err
+		return []domain.Traffic{}, err
 	}
 	if err := json.NewDecoder(file).Decode(&traffic); err != nil {
-		return []Traffic{}, err
+		return []domain.Traffic{}, err
 	}
 	return traffic, nil
 }
 
 // ParseFromJSONString takes a json string value and returns parsed traffic and error
-func ParseFromJSONString(JSONStr string) ([]Traffic, error) {
-	traffic := []Traffic{}
+func (t *TrafficParser) ParseFromJSONString(JSONStr string) ([]domain.Traffic, error) {
+	traffic := []domain.Traffic{}
 	if len(JSONStr) == 0 {
-		return []Traffic{}, errors.New("empty string")
+		return []domain.Traffic{}, errors.New("empty string")
 	}
 	if err := json.Unmarshal([]byte(JSONStr), &traffic); err != nil {
-		return []Traffic{}, err
+		return []domain.Traffic{}, err
 	}
 	return traffic, nil
 }

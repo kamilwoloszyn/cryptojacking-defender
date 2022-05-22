@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/app/tstraining"
+	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 	"github.com/sjwhitworth/golearn/base"
 	"github.com/sjwhitworth/golearn/evaluation"
 	"github.com/sjwhitworth/golearn/knn"
 )
 
 type DataProcessor struct {
-	trainingFileName string
+	trainingFilePath string
 	classifier       *knn.KNNClassifier
 }
 
@@ -23,13 +23,13 @@ func New(trainingAbsFilePath string) (*DataProcessor, error) {
 		return nil, fmt.Errorf("file name should not be empty")
 	}
 	return &DataProcessor{
-		trainingFileName: trainingAbsFilePath,
+		trainingFilePath: trainingAbsFilePath,
 	}, nil
 }
 
 // Initialize parses a training data, make prediction and returns float64 - accurancy, and error
 func (dp *DataProcessor) Initialize() (float64, error) {
-	rawData, err := base.ParseCSVToInstances(dp.trainingFileName, true)
+	rawData, err := base.ParseCSVToInstances(dp.trainingFilePath, true)
 	if err != nil {
 		return 0, fmt.Errorf(
 			"couldn't parse csv: %s", err.Error(),
@@ -54,12 +54,12 @@ func (dp *DataProcessor) Initialize() (float64, error) {
 // Warning: The data should have filled column "estimated_behaviour"  with values cryptojacking and nocryptojacking
 // This values won't be taken into account (has no impact on prediction results), an library that makes prediction
 // returns an err while this column is empty or have only one of this values
-func (dp *DataProcessor) Estimate(absPathToCSVFile string) ([]string, error) {
+func (dp *DataProcessor) Estimate() ([]string, error) {
 	results := []string{}
 	if dp.classifier == nil {
 		return []string{}, fmt.Errorf("Estimate: classifier is empty")
 	}
-	rawData, err := base.ParseCSVToInstances(absPathToCSVFile, true)
+	rawData, err := base.ParseCSVToInstances(dp.trainingFilePath, true)
 	if err != nil {
 		return []string{}, fmt.Errorf("Estimate: Could not read a given file path")
 	}
@@ -74,7 +74,7 @@ func (dp *DataProcessor) Estimate(absPathToCSVFile string) ([]string, error) {
 	return results, nil
 }
 
-func (dp *DataProcessor) PrintStatistic(trafficStats []tstraining.TsTrainingData, resultLabels []string) {
+func (dp *DataProcessor) PrintStatistic(trafficStats []domain.TsTrainingData, resultLabels []string) {
 	if len(trafficStats) == len(resultLabels) && len(trafficStats) > 0 {
 		var cryptojackingCount int
 		for k, v := range trafficStats {

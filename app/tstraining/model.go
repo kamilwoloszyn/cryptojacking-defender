@@ -22,8 +22,28 @@ var baseCols = []string{
 	"estimated_behaviour",
 }
 
+type DataTrainer struct {
+	workingPath       string
+	dryRun            bool
+	containsIP        bool
+	dataForPrediction bool
+	readDataHeader    bool
+}
+
+func NewDataTrainer(
+	workingPath string,
+	dryRun bool,
+	containsIP bool,
+	dataForPrediction bool,
+	readDataHeader bool,
+) *DataTrainer {
+	return &DataTrainer{
+		dryRun: dryRun,
+	}
+}
+
 // Extract extracts training data from PacketFlow struct
-func Extract(trafficStats *[]domain.TrafficStatistic) []domain.TsTrainingData {
+func (d *DataTrainer) Extract(trafficStats *[]domain.TrafficStatistic) []domain.TsTrainingData {
 	var trainingData []domain.TsTrainingData
 	for _, trafficItem := range *trafficStats {
 		trainingData = append(trainingData, domain.TsTrainingData{
@@ -42,20 +62,22 @@ func Extract(trafficStats *[]domain.TrafficStatistic) []domain.TsTrainingData {
 }
 
 // SaveAsJSON saves training data into a txt file
-func SaveAsJSON(data *[]domain.TsTrainingData, absPath string) error {
+func (d *DataTrainer) SaveAsJSON(data *[]domain.TsTrainingData, absPath string) error {
 	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(data); err != nil {
 		return fmt.Errorf(
 			"couldn't encode JSON: %v", err.Error(),
 		)
 	}
-	os.WriteFile(absPath, buf.Bytes(), 0755)
+	if !d.dryRun {
+		os.WriteFile(absPath, buf.Bytes(), 0755)
+	}
 	return nil
 }
 
 // LoadFromJSON returns trained data from a specified file.
 // If read fails, then returns an empty array with error
-func LoadFromJSON(absPath string) ([]domain.TsTrainingData, error) {
+func (d *DataTrainer) LoadFromJSON(absPath string) ([]domain.TsTrainingData, error) {
 	tData := []domain.TsTrainingData{}
 	f, err := os.Open(absPath)
 	if err != nil {
@@ -71,21 +93,25 @@ func LoadFromJSON(absPath string) ([]domain.TsTrainingData, error) {
 // SaveAsCSV takes a data and absolute path to a file
 // Returns err while something go bad.
 // If csv contains IP addr, then should not be used for training model, only for user pourpose
-func SaveAsCSV(data []domain.TsTrainingData, absPath string, containsIP, forPrediction bool) error {
+func (d *DataTrainer) SaveAsCSV(data []domain.TsTrainingData, absPath string) error {
 	if absPath == "" {
 		return fmt.Errorf("no name specified")
 	}
 	if len(data) == 0 {
 		return fmt.Errorf("no data provided")
 	}
-	f, err := os.Create(absPath)
-	if err != nil {
-		return fmt.Errorf(
-			"could not create a file : %s", err.Error(),
-		)
+	var f *os.File
+	if !d.dryRun {
+		var err error
+		f, err = os.Create(absPath)
+		if err != nil {
+			return fmt.Errorf(
+				"could not create a file : %s", err.Error(),
+			)
+		}
 	}
 	// It solves "Incopatible attrs while loading a dataset for prediction "
-	if forPrediction {
+	if d.dataForPrediction {
 		data[0].ConsideredAs = "nocryptojacking"
 		data[1].ConsideredAs = "cryptojacking"
 	}
@@ -93,13 +119,13 @@ func SaveAsCSV(data []domain.TsTrainingData, absPath string, containsIP, forPred
 	records := [][]string{
 		baseCols,
 	}
-	if containsIP {
+	if d.containsIP {
 		cols := append(baseCols, []string{"src_ip", "dst_ip"}...)
 		records = [][]string{
 			cols,
 		}
 	}
-	if containsIP {
+	if d.containsIP {
 		for _, trainingDataItem := range data {
 			records = append(records, []string{
 				fmt.Sprintf("%f", trainingDataItem.SentMaliciousPacketRatio),
@@ -129,7 +155,9 @@ func SaveAsCSV(data []domain.TsTrainingData, absPath string, containsIP, forPred
 		}
 
 	}
-	writer.WriteAll(records)
+	if !d.dryRun {
+		writer.WriteAll(records)
+	}
 	return nil
 }
 
@@ -138,12 +166,12 @@ func SaveAsCSV(data []domain.TsTrainingData, absPath string, containsIP, forPred
 // Returns array of training data.
 // If something go bad, then returns an empty array with error
 // Not suitable for reading model that contain IP fields, only for trained model ready for production !
-func ReadFromCSV(absPath string, containsHeader bool) ([]domain.TsTrainingData, error) {
+func (d *DataTrainer) ReadFromCSV() ([]domain.TsTrainingData, error) {
 	trainingData := []domain.TsTrainingData{}
-	if absPath == "" {
+	if d.workingPath == "" {
 		return trainingData, fmt.Errorf("ReadFromCSV :path to file is empty")
 	}
-	file, err := os.Open(absPath)
+	file, err := os.Open(d.workingPath)
 	if err != nil {
 		return trainingData, fmt.Errorf("ReadFromCSV: couldn't read file: %s", err.Error())
 	}
@@ -154,7 +182,7 @@ func ReadFromCSV(absPath string, containsHeader bool) ([]domain.TsTrainingData, 
 		return trainingData, fmt.Errorf("ReadFromCSV: couldn't get records: %s", err.Error())
 	}
 	posX := 0
-	if containsHeader {
+	if d.readDataHeader {
 		posX = 1
 	}
 	for ; posX < len(records); posX++ {

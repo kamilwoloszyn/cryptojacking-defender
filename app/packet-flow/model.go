@@ -5,19 +5,28 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/app/minerscan"
-	"github.com/kamilwoloszyn/cryptojacking-defender/app/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app"
 	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
 
+type TrafficStatisticGenerator struct {
+	service *app.Service
+}
+
+func NewTrafficStatisticsGenerator(s *app.Service) *TrafficStatisticGenerator {
+	return &TrafficStatisticGenerator{
+		service: s,
+	}
+}
+
 // Generate generates a traffic statistics with implemented MinerScanner
-func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) ([]domain.TrafficStatistic, error) {
+func (t *TrafficStatisticGenerator) Generate(traffic *[]domain.Traffic) ([]domain.TrafficStatistic, error) {
 	trafficStatistic := []domain.TrafficStatistic{}
 	for _, trafficItem := range *traffic {
 		if complete := isComplete(trafficItem); !complete {
 			return trafficStatistic, errors.New("incomplete traffic")
 		}
-		keywordsQty := ms.Scan(&trafficItem)
+		keywordsQty := t.service.Scan(&trafficItem)
 		if duplicate, inversed, location := checkIfExistPairInTS(&trafficStatistic, trafficItem.Source.Layers.IPSrc[0], trafficItem.Source.Layers.IPDst[0]); duplicate {
 			if inversed {
 				trafficStatistic[location].RecvQty++
@@ -49,7 +58,7 @@ func Generate(traffic *[]traffic.Traffic, ms *minerscan.MinerScanner) ([]domain.
 }
 
 // SelectIP converts trafficStatistic in a way, where selectedIP is always srcIP.
-func SelectIP(ts []domain.TrafficStatistic, ipToSelect string) []domain.TrafficStatistic {
+func (t *TrafficStatisticGenerator) SelectIP(ts []domain.TrafficStatistic, ipToSelect string) []domain.TrafficStatistic {
 	swapIndexes := []int{}
 	for i, item := range ts {
 		if item.Base.DstIP == ipToSelect {

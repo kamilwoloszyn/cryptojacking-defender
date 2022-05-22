@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/dataprocessor"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/dataprocessor"
 )
 
 const (
