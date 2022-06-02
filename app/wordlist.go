@@ -4,5 +4,4 @@ import "github.com/kamilwoloszyn/cryptojacking-defender/app/wordlist"
 
 type Wordlist interface {
 	ParseFromFile(absPath string) (*wordlist.WordListResponse, error)
-	Extract(string) (*Wordlist, error)
 }
