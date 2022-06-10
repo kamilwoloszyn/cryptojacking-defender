@@ -1,8 +1,0 @@
-req:
-nonce
-result
-res:
-hashes
-blob
-job
-hash
