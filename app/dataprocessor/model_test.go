@@ -2,6 +2,7 @@ package dataprocessor_test
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
@@ -9,8 +10,12 @@ import (
 )
 
 const (
-	PathToCSVDataFile = "/home/kamil/Projects/cryptojacking-defender/models/dataprocessor/traffic_data.csv"
+	PathToCSVDataFile = "/test/dataprocessor/traffic_data.csv"
+	PathToTrainData1  = "/test/dataprocessor/train_data_1.csv"
+	PathToTrainData2  = "/test/dataprocessor/train_data_2.csv"
 )
+
+var projectPath string = os.Getenv("GOPATH") + "/src/github.com/cryptojacking-defender"
 
 func TestInitialize(t *testing.T) {
 	testCases := []struct {
@@ -20,7 +25,7 @@ func TestInitialize(t *testing.T) {
 	}{
 		{
 			desc:    "existing file path",
-			arg:     PathToCSVDataFile,
+			arg:     projectPath + PathToCSVDataFile,
 			wantErr: false,
 		},
 	}
@@ -35,16 +40,14 @@ func TestInitialize(t *testing.T) {
 			accurancy, err := dp.Initialize()
 			fmt.Printf("got  accurancy: %f\n", accurancy)
 			if equal := reflect.DeepEqual(isErr(err), tC.wantErr); !equal {
-				t.Fatal(
-					fmt.Sprintf("Got %v but expected err to be: %v", err, tC.wantErr),
-				)
+				t.Fatalf("Got %v but expected err to be: %v", err, tC.wantErr)
 			}
 		})
 	}
 }
 
 func TestPrediction(t *testing.T) {
-	dp, err := dataprocessor.New(PathToCSVDataFile)
+	dp, err := dataprocessor.New(projectPath + PathToCSVDataFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +63,7 @@ func TestPrediction(t *testing.T) {
 	}{
 		{
 			desc: "correct train data",
-			arg:  "/home/kamil/Projects/cryptojacking-defender/tests/dataprocessor/test_data_1.csv",
+			arg:  projectPath + PathToTrainData1,
 			expected: []string{
 				"cryptojacking",
 				"nocryptojacking",
@@ -69,7 +72,7 @@ func TestPrediction(t *testing.T) {
 		},
 		{
 			desc: "variable data",
-			arg:  "/home/kamil/Projects/cryptojacking-defender/tests/dataprocessor/test_data_2.csv",
+			arg:  projectPath + PathToTrainData2,
 			expected: []string{
 				"cryptojacking",
 				"nocryptojacking",

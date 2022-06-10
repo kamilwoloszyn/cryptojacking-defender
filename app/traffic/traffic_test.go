@@ -2,11 +2,11 @@ package traffic_test
 
 import (
 	_ "embed"
-	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/kamilwoloszyn/cryptojacking-defender/models/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/app/traffic"
+	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
 
 //go:embed traffic_data_test.txt
@@ -16,18 +16,38 @@ func TestGenerateTrafficStatistcFromJSONString(t *testing.T) {
 	testCases := []struct {
 		desc     string
 		arg      string
-		expected []traffic.Traffic
+		expected []domain.Traffic
 	}{
 		{
 			desc: "Correct JSON file",
 			arg:  JSONFile,
-			expected: []traffic.Traffic{
+			expected: []domain.Traffic{
 				{
 					Index:       "packets-2021-08-09",
 					TypeTraffic: "doc",
 					Score:       nil,
-					Source: traffic.Source{
-						Layers: traffic.Layers{
+					Source: struct {
+						Layers struct {
+							IPSrc             []string "json:\"ip.src\""
+							IPDst             []string "json:\"ip.dst\""
+							TLSContentType    []string "json:\"tls.record.content_type\""
+							FrameNumber       []string "json:\"frame.number\""
+							FrameLength       []string "json:\"frame.len\""
+							FrameTime         []string "json:\"frame.time\""
+							FrameTimeRelative []string "json:\"frame.time_relative\""
+							TextData          []string "json:\"text\""
+						} "json:\"layers\""
+					}{
+						Layers: struct {
+							IPSrc             []string "json:\"ip.src\""
+							IPDst             []string "json:\"ip.dst\""
+							TLSContentType    []string "json:\"tls.record.content_type\""
+							FrameNumber       []string "json:\"frame.number\""
+							FrameLength       []string "json:\"frame.len\""
+							FrameTime         []string "json:\"frame.time\""
+							FrameTimeRelative []string "json:\"frame.time_relative\""
+							TextData          []string "json:\"text\""
+						}{
 							IPSrc:             []string{"192.168.0.104"},
 							IPDst:             []string{"142.250.75.3"},
 							TLSContentType:    []string{"22"},
@@ -68,8 +88,28 @@ func TestGenerateTrafficStatistcFromJSONString(t *testing.T) {
 					Index:       "packets-2021-08-09",
 					TypeTraffic: "doc",
 					Score:       nil,
-					Source: traffic.Source{
-						traffic.Layers{
+					Source: struct {
+						Layers struct {
+							IPSrc             []string "json:\"ip.src\""
+							IPDst             []string "json:\"ip.dst\""
+							TLSContentType    []string "json:\"tls.record.content_type\""
+							FrameNumber       []string "json:\"frame.number\""
+							FrameLength       []string "json:\"frame.len\""
+							FrameTime         []string "json:\"frame.time\""
+							FrameTimeRelative []string "json:\"frame.time_relative\""
+							TextData          []string "json:\"text\""
+						} "json:\"layers\""
+					}{
+						Layers: struct {
+							IPSrc             []string "json:\"ip.src\""
+							IPDst             []string "json:\"ip.dst\""
+							TLSContentType    []string "json:\"tls.record.content_type\""
+							FrameNumber       []string "json:\"frame.number\""
+							FrameLength       []string "json:\"frame.len\""
+							FrameTime         []string "json:\"frame.time\""
+							FrameTimeRelative []string "json:\"frame.time_relative\""
+							TextData          []string "json:\"text\""
+						}{
 							IPSrc:             []string{"192.168.0.104"},
 							IPDst:             []string{"40.114.177.156"},
 							TLSContentType:    []string{"22"},
@@ -111,16 +151,17 @@ func TestGenerateTrafficStatistcFromJSONString(t *testing.T) {
 		{
 			desc:     "Wrong text file",
 			arg:      "dfdanffnsikfds",
-			expected: []traffic.Traffic{},
+			expected: []domain.Traffic{},
 		},
 	}
 
 	for i, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			t.Logf("[%d/%d]: Running ...\n", i+1, len(testCases))
-			if result, err := traffic.ParseFromJSONString(tC.arg); !reflect.DeepEqual(result, tC.expected) {
-				t.Error(
-					fmt.Sprintf("Task %d failed. Got %v, but expected %v \n err : %v", i+1, result, tC.expected, err),
+			trafficParserService := traffic.NewTrafficParser("")
+			if result, err := trafficParserService.ParseFromJSONString(tC.arg); !reflect.DeepEqual(result, tC.expected) {
+				t.Errorf(
+					"Task %d failed. Got %v, but expected %v \n err : %v", i+1, result, tC.expected, err,
 				)
 			}
 

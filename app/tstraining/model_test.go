@@ -9,8 +9,8 @@ import (
 	"github.com/kamilwoloszyn/cryptojacking-defender/domain"
 )
 
-const pathToJSONFile = "/tmp/test_data.json"
-const pathToCSVFile = "/tmp/test_data.csv"
+const JSONFile = "test_data.json"
+const CSVFile = "test_data.csv"
 
 func TestExtract(t *testing.T) {
 	testCases := []struct {
@@ -154,7 +154,8 @@ func TestExtract(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if result := tstraining.Extract(&tC.arg); !reflect.DeepEqual(result, tC.expected) {
+			trainer := tstraining.NewDataTrainer("", true, true, true, true)
+			if result := trainer.Extract(&tC.arg); !reflect.DeepEqual(result, tC.expected) {
 				t.Fatalf(
 					"Got %v but expected %v", result, tC.expected,
 				)
@@ -172,7 +173,7 @@ func TestSaveAsJSON(t *testing.T) {
 	}{
 		{
 			desc:       "Correct training data",
-			pathToFile: pathToJSONFile,
+			pathToFile: os.TempDir() + CSVFile,
 			arg: []domain.TsTrainingData{
 				{
 					SentMaliciousPacketRatio: 3.0 / 5.0,
@@ -242,12 +243,13 @@ func TestSaveAsJSON(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if err := tstraining.SaveAsJSON(&tC.arg, tC.pathToFile); err != nil {
+			trainer := tstraining.NewDataTrainer("", true, true, true, true)
+			if err := trainer.SaveAsJSON(&tC.arg, tC.pathToFile); err != nil {
 				t.Fatalf(
 					"Couldn't save JSON: %s", err.Error(),
 				)
 			}
-			result, err := tstraining.LoadFromJSON(pathToJSONFile)
+			result, err := trainer.LoadFromJSON(os.TempDir() + JSONFile)
 			if err != nil {
 				t.Fatalf("Error during loading a file: %s", err)
 			}
@@ -336,12 +338,13 @@ func TestSaveReadCSV(t *testing.T) {
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			if err := tstraining.SaveAsCSV(tC.arg.data, pathToCSVFile, tC.arg.containsIP, tC.arg.forPrediction); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
+			trainer := tstraining.NewDataTrainer(os.TempDir()+CSVFile, true, tC.arg.containsIP, tC.arg.forPrediction, true)
+			if err := trainer.SaveAsCSV(tC.arg.data, os.TempDir()+CSVFile); !reflect.DeepEqual(err != nil, tC.wantSaveErr) {
 				t.Fatalf(
 					"Got err: %v, but expected to be %v", err.Error(), tC.wantReadErr,
 				)
 			}
-			if result, err := tstraining.ReadFromCSV(os.TempDir()+"/test_data.csv", true); !reflect.DeepEqual(result, tC.expected) || !reflect.DeepEqual(err != nil, tC.wantReadErr) {
+			if result, err := trainer.ReadFromCSV(); !reflect.DeepEqual(result, tC.expected) || !reflect.DeepEqual(err != nil, tC.wantReadErr) {
 				if (err != nil) != tC.wantReadErr {
 					t.Fatalf("Got err: %v, but expected: %v ", err, tC.wantReadErr)
 				}
