@@ -111,3 +111,7 @@ func (s *Service) ReadFromCSV() ([]domain.TsTrainingData, error) {
 func (s *Service) ParseFromFile() (*wordlist.WordListResponse, error) {
 	return s.wordList.ParseFromFile()
 }
+
+func (s *Service) Decrypt(pcapLocation string, decryptedPathJSON string) error {
+	return s.tshark.Decrypt(pcapLocation, decryptedPathJSON)
+}
