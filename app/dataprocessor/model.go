@@ -13,6 +13,7 @@ import (
 
 type DataProcessor struct {
 	trainingFilePath string
+	testDataPath     string
 	classifier       *knn.KNNClassifier
 }
 
@@ -27,8 +28,8 @@ func New(trainingAbsFilePath string) (*DataProcessor, error) {
 	}, nil
 }
 
-// Initialize parses a training data, make prediction and returns float64 - accurancy, and error
-func (dp *DataProcessor) Initialize() (float64, error) {
+// ProcessTrainingData parses a training data, make prediction and returns float64 - accurancy, and error
+func (dp *DataProcessor) ProcessTrainingData() (float64, error) {
 	rawData, err := base.ParseCSVToInstances(dp.trainingFilePath, true)
 	if err != nil {
 		return 0, fmt.Errorf(
@@ -45,7 +46,7 @@ func (dp *DataProcessor) Initialize() (float64, error) {
 	}
 	accurancy, err := dp.verifyPrediction(testData, prediction)
 	if err != nil {
-		return 0, fmt.Errorf("initialize(): couldn't get accurancy of your model: %s", err.Error())
+		return 0, fmt.Errorf("ProcessTrainingData(): couldn't get accurancy of your model: %s", err.Error())
 	}
 	return accurancy, nil
 }
@@ -54,12 +55,12 @@ func (dp *DataProcessor) Initialize() (float64, error) {
 // Warning: The data should have filled column "estimated_behaviour"  with values cryptojacking and nocryptojacking
 // This values won't be taken into account (has no impact on prediction results), an library that makes prediction
 // returns an err while this column is empty or have only one of this values
-func (dp *DataProcessor) Estimate() ([]string, error) {
+func (dp *DataProcessor) Estimate(testDataPath string) ([]string, error) {
 	results := []string{}
 	if dp.classifier == nil {
 		return []string{}, fmt.Errorf("Estimate: classifier is empty")
 	}
-	rawData, err := base.ParseCSVToInstances(dp.trainingFilePath, true)
+	rawData, err := base.ParseCSVToInstances(testDataPath, true)
 	if err != nil {
 		return []string{}, fmt.Errorf("Estimate: Could not read a given file path")
 	}
