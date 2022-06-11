@@ -56,12 +56,12 @@ func (s *Service) FixBrokenPackage(ctx context.Context) {
 	s.tcpdump.FixBrokenPackage(ctx)
 }
 
-func (s *Service) Initialize() (float64, error) {
-	return s.dataProcessor.Initialize()
+func (s *Service) ProcessTrainingData() (float64, error) {
+	return s.dataProcessor.ProcessTrainingData()
 }
 
-func (s *Service) Estimate() ([]string, error) {
-	return s.dataProcessor.Estimate()
+func (s *Service) Estimate(testDataPath string) ([]string, error) {
+	return s.dataProcessor.Estimate(testDataPath)
 }
 
 func (s *Service) PrintStatistic(trafficStats []domain.TsTrainingData, resultLabels []string) {
@@ -108,6 +108,6 @@ func (s *Service) ReadFromCSV() ([]domain.TsTrainingData, error) {
 	return s.dataTrainer.ReadFromCSV()
 }
 
-func (s *Service) ParseFromFile(absPath string) (*wordlist.WordListResponse, error) {
-	return s.wordList.ParseFromFile(absPath)
+func (s *Service) ParseFromFile() (*wordlist.WordListResponse, error) {
+	return s.wordList.ParseFromFile()
 }

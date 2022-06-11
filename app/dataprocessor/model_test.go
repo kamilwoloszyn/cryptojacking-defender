@@ -37,7 +37,7 @@ func TestInitialize(t *testing.T) {
 					"Got error %v", err,
 				)
 			}
-			accurancy, err := dp.Initialize()
+			accurancy, err := dp.ProcessTrainingData()
 			fmt.Printf("got  accurancy: %f\n", accurancy)
 			if equal := reflect.DeepEqual(isErr(err), tC.wantErr); !equal {
 				t.Fatalf("Got %v but expected err to be: %v", err, tC.wantErr)
@@ -51,7 +51,7 @@ func TestPrediction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := dp.Initialize(); err != nil {
+	if _, err := dp.ProcessTrainingData(); err != nil {
 		t.Fatal(err)
 	}
 

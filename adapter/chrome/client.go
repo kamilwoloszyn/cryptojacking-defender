@@ -17,7 +17,7 @@ func New(
 	}
 }
 
-func (c *Chrome) Run() error {
+func (c *Chrome) RunChrome() error {
 	cmd := exec.Command("google-chrome", "--ssl-key-log-file="+c.SslFile)
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("[FATAL]: Couldn't run browser: %s", err)

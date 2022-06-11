@@ -3,21 +3,21 @@ package mock
 import "github.com/kamilwoloszyn/cryptojacking-defender/domain"
 
 type MockedDataProcessor struct {
-	MockInitialize     func() (float64, error)
-	MockEstimate       func() ([]string, error)
-	MockPrintStatistic func([]domain.TsTrainingData, []string)
+	MockProcessTrainingData func() (float64, error)
+	MockEstimate            func(string) ([]string, error)
+	MockPrintStatistic      func([]domain.TsTrainingData, []string)
 }
 
 func (m *MockedDataProcessor) Initialize() (float64, error) {
-	if m.MockInitialize != nil {
-		return m.MockInitialize()
+	if m.MockProcessTrainingData != nil {
+		return m.MockProcessTrainingData()
 	}
 	return 0, ErrNotMocked
 }
 
-func (m *MockedDataProcessor) Estimate() ([]string, error) {
+func (m *MockedDataProcessor) Estimate(testDataPath string) ([]string, error) {
 	if m.MockEstimate != nil {
-		return m.MockEstimate()
+		return m.MockEstimate(testDataPath)
 	}
 	return []string{}, ErrNotMocked
 }
