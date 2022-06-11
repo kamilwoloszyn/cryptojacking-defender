@@ -122,7 +122,7 @@ func convertStrToInt(strToParse string) int {
 	return result
 }
 
-func isComplete(item traffic.Traffic) bool {
+func isComplete(item domain.Traffic) bool {
 	if item.Source.Layers.IPSrc[0] != "" &&
 		item.Source.Layers.IPDst[0] != "" &&
 		item.Source.Layers.FrameTimeRelative[0] != "" &&
