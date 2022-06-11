@@ -31,13 +31,13 @@ const (
 
 // ParseFromFile takes absPath to a file, and returns pointer to a wordlist
 // If something go bad, then returns nil with error
-func (w *WordList) ParseFromFile(absPath string) (*WordListResponse, error) {
+func (w *WordList) ParseFromFile() (*WordListResponse, error) {
 	var flag switchFlag
 	wList := WordListResponse{
 		Req: []string{},
 		Res: []string{},
 	}
-	file, err := os.Open(absPath)
+	file, err := os.Open(w.workingFile)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Loading wordlist from file")
 	}
